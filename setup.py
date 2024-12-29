@@ -17,7 +17,9 @@ def create_directories_and_files(base_path):
 
     files = {
         "data/__init__.py": "",
-        "data/StockDataFetcher.py": "",
+        "data/StockDataFetcherBase.py": "",
+        "data/YahooFinanceStockDataFetcher.py": "",
+        "data/AlphaVantageStockDataFetcher.py": "",
         "preprocessing/__init__.py": "",
         "preprocessing/MissingValueHandler.py": "",
         "preprocessing/OutlierDetector.py": "",

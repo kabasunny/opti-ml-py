@@ -1,1 +1,1 @@
-pip freeze > requirements.txt
+# Project README\nThis is the project description and instructions.

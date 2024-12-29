@@ -1,5 +1,3 @@
-# data\main.py
-
 import sys
 import os
 
@@ -8,21 +6,19 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.abspath(os.path.join(current_dir, ".."))
 if project_root not in sys.path:
     sys.path.append(project_root)
+from data.YahooFinanceStockDataFetcher import YahooFinanceStockDataFetcher
+from data.JQuantsStockDataFetcher import JQuantsStockDataFetcher
 
-import pandas as pd
-from StockDataFetcher import StockDataFetcher
 
+def main(fetcher):
+    raw_data = fetcher.fetch_data()
+    standardized_data = fetcher.standardize_data(raw_data)
+    if standardized_data.empty:
+        print("No data found for the specified parameters.")
+        return
 
-# テスト用のコード
-def main():
-    symbol = "7203.T"
-    start_date = pd.Timestamp("2023-01-01")
-    end_date = pd.Timestamp("2023-12-31")
-
-    fetcher = StockDataFetcher(symbol, start_date, end_date)
-    stock_data = fetcher.fetch_data()
     print("Daily data:")
-    print(stock_data.head())
+    print(standardized_data.head())
 
     # 保存先ディレクトリの確認と作成
     save_dir = "data/test"
@@ -31,8 +27,39 @@ def main():
 
     # データをファイルに保存する例
     save_path = os.path.join(save_dir, "stock_data.csv")
-    stock_data.save_to_csv(save_path)
+    standardized_data.to_csv(save_path, index=False)
+
+    # データ構造の確認
+    print("\nデータの詳細情報 : standardized_data.info()")
+    print(standardized_data.info())
+
+    print("\nデータの基本統計量 : standardized_data.describe()")
+    print(standardized_data.describe())
+
+    print("\nデータのカラム名 : standardized_data.columns")
+    print(standardized_data.columns)
+
+
+# フラグを交互に切り替える関数
+def toggle_use_jquants(flag):
+    return not flag
 
 
 if __name__ == "__main__":
-    main()
+    # 環境変数や設定ファイルを使用して実装クラスを切り替え
+    use_jquants = True  # 初期値をTrueに設定
+    max_iterations = 2  # 最大ループ回数を設定
+    for _ in range(max_iterations):  # ここでは2回交互に実行します
+        if use_jquants:
+            print("\n★JQuantsStockDataFetcher★")
+            fetcher = JQuantsStockDataFetcher(
+                "7203", "2023-01-01", "2023-12-31"
+            )  # 株式コードから".T"を削除
+        else:
+            print("\n★YahooFinanceStockDataFetcher★")
+            fetcher = YahooFinanceStockDataFetcher(
+                "7203", "2023-01-01", "2023-12-31"
+            )  # 株式コードから".T"を削除
+        main(fetcher)
+        # フラグを交互に切り替え
+        use_jquants = toggle_use_jquants(use_jquants)
