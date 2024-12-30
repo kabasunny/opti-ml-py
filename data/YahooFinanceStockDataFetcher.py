@@ -1,17 +1,12 @@
 import yfinance as yf
 import pandas as pd
 from data.StockDataFetcherBase import StockDataFetcherBase
+from data.decorators import type_check  # デコレータをインポート
 
 
 class YahooFinanceStockDataFetcher(StockDataFetcherBase):
+    @type_check((None, str, (str, pd.Timestamp), (str, pd.Timestamp)), None)
     def __init__(self, symbol, start_date, end_date):
-        if not isinstance(symbol, str):
-            raise TypeError("Symbol should be a string")
-        if not isinstance(start_date, (str, pd.Timestamp)):
-            raise TypeError("Start date should be a string or pandas Timestamp")
-        if not isinstance(end_date, (str, pd.Timestamp)):
-            raise TypeError("End date should be a string or pandas Timestamp")
-
         self.symbol = symbol + ".T"
         self.start_date = (
             pd.Timestamp(start_date) if isinstance(start_date, str) else start_date
@@ -20,6 +15,7 @@ class YahooFinanceStockDataFetcher(StockDataFetcherBase):
             pd.Timestamp(end_date) if isinstance(end_date, str) else end_date
         )
 
+    @type_check((None,), pd.DataFrame)
     def fetch_data(self) -> pd.DataFrame:
         data = yf.download(
             self.symbol, start=self.start_date, end=self.end_date, interval="1d"
@@ -28,6 +24,7 @@ class YahooFinanceStockDataFetcher(StockDataFetcherBase):
             data.columns = data.columns.droplevel(1)
         return data
 
+    @type_check((None, pd.DataFrame), pd.DataFrame)
     def standardize_data(self, data: pd.DataFrame) -> pd.DataFrame:
         data = data.reset_index()
         # シンボルから .T を除外

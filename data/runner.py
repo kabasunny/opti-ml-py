@@ -8,9 +8,10 @@ if project_root not in sys.path:
     sys.path.append(project_root)
 from data.YahooFinanceStockDataFetcher import YahooFinanceStockDataFetcher
 from data.JQuantsStockDataFetcher import JQuantsStockDataFetcher
+from data.save_data import save_raw_data
 
 
-def main(fetcher):
+def runner(fetcher):
     raw_data = fetcher.fetch_data()
     standardized_data = fetcher.standardize_data(raw_data)
     if standardized_data.empty:
@@ -41,7 +42,7 @@ def main(fetcher):
 
 
 # フラグを交互に切り替える関数
-def toggle_use_jquants(flag):
+def toggle(flag):
     return not flag
 
 
@@ -60,6 +61,6 @@ if __name__ == "__main__":
             fetcher = YahooFinanceStockDataFetcher(
                 "7203", "2023-01-01", "2023-12-31"
             )  # 株式コードから".T"を削除
-        main(fetcher)
+        runner(fetcher)  # メソッド名を runner に変更
         # フラグを交互に切り替え
-        use_jquants = toggle_use_jquants(use_jquants)
+        use_jquants = toggle(use_jquants)

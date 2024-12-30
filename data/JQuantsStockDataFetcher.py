@@ -4,18 +4,13 @@ import pandas as pd
 from dotenv import load_dotenv
 from data.StockDataFetcherBase import StockDataFetcherBase
 import time
+from data.decorators import type_check  # デコレータをインポート
 
 
 class JQuantsStockDataFetcher(StockDataFetcherBase):
+    @type_check((None, str, (str, pd.Timestamp), (str, pd.Timestamp)), None)
     def __init__(self, symbol, start_date, end_date):
-        if not isinstance(symbol, str):
-            raise TypeError("Symbol should be a string")
-        if not isinstance(start_date, (str, pd.Timestamp)):
-            raise TypeError("Start date should be a string or pandas Timestamp")
-        if not isinstance(end_date, (str, pd.Timestamp)):
-            raise TypeError("End date should be a string or pandas Timestamp")
-
-        self.symbol = symbol
+        self.symbol = str(symbol)  # symbol を文字列にキャスト
         self.start_date = (
             pd.Timestamp(start_date) if isinstance(start_date, str) else start_date
         )
@@ -28,8 +23,8 @@ class JQuantsStockDataFetcher(StockDataFetcherBase):
         self.refresh_token = self.get_refresh_token()
         self.id_token = self.get_id_token(self.refresh_token)
 
+    @type_check((None,), str)
     def get_refresh_token(self):
-        """リフレッシュトークンを取得する"""
         email = os.getenv("JQUANTS_EMAIL")
         password = os.getenv("JQUANTS_PASSWORD")
         url = "https://api.jquants.com/v1/token/auth_user"
@@ -37,18 +32,18 @@ class JQuantsStockDataFetcher(StockDataFetcherBase):
         data = {"mailaddress": email, "password": password}
 
         response = requests.post(url, headers=headers, json=data)
-        response.raise_for_status()  # ステータスコードが200番台以外の場合に例外を投げる
+        response.raise_for_status()
         return response.json().get("refreshToken")
 
+    @type_check((None, str), str)
     def get_id_token(self, refresh_token):
-        """リフレッシュトークンを使ってIDトークンを取得する"""
         url = f"https://api.jquants.com/v1/token/auth_refresh?refreshtoken={refresh_token}"
         response = requests.post(url)
-        response.raise_for_status()  # ステータスコードが200番台以外の場合に例外を投げる
+        response.raise_for_status()
         return response.json().get("idToken")
 
+    @type_check((None,), pd.DataFrame)
     def fetch_data(self) -> pd.DataFrame:
-        """日次株価データを取得する"""
         url = "https://api.jquants.com/v1/prices/daily_quotes"
         headers = {"Authorization": f"Bearer {self.id_token}"}
         params = {
@@ -61,7 +56,7 @@ class JQuantsStockDataFetcher(StockDataFetcherBase):
         while True:
             response = requests.get(url, headers=headers, params=params)
             try:
-                response.raise_for_status()  # ステータスコードが200番台以外の場合に例外を投げる
+                response.raise_for_status()
                 result = response.json()
                 data.extend(result.get("daily_quotes", []))
                 if "pagination_key" not in result:
@@ -71,12 +66,12 @@ class JQuantsStockDataFetcher(StockDataFetcherBase):
                 print(f"Error fetching data for symbol {self.symbol}: {e}")
                 break
 
-            # レートリミット対応のための待機時間
             time.sleep(1)  # 1秒の待機
 
         df = pd.DataFrame(data)
         return df
 
+    @type_check((None, pd.DataFrame), pd.DataFrame)
     def standardize_data(self, data: pd.DataFrame) -> pd.DataFrame:
         data = data.rename(
             columns={
@@ -88,9 +83,7 @@ class JQuantsStockDataFetcher(StockDataFetcherBase):
                 "Volume": "volume",
             }
         )
-        # シンボルの先頭4桁のみを返す
         data["symbol"] = data["Code"].str[:4]
-        data["volume"] = data["volume"].astype(int)  # 小数を整数に変換
-        # `date`を文字列に変換
+        data["volume"] = data["volume"].astype(int)
         data["date"] = data["date"].astype(str)
         return data[["date", "symbol", "open", "high", "low", "close", "volume"]]
