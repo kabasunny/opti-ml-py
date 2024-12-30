@@ -4,8 +4,8 @@ from decorators.ArgsChecker import ArgsChecker  # デコレータクラスをイ
 
 
 class DataSaver:
-    @ArgsChecker((pd.DataFrame, str), None)
-    def save_raw_data(self, data, save_path, **kwargs):
+    @ArgsChecker((None, pd.DataFrame, str), None)
+    def save_raw_data(self, data, save_path):
         os.makedirs(os.path.dirname(save_path), exist_ok=True)
         data.to_csv(save_path, index=False)
         print(f"Data saved to {save_path}")

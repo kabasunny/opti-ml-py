@@ -9,7 +9,7 @@ if project_root not in sys.path:
 
 from data.YahooFinanceStockDataFetcher import YahooFinanceStockDataFetcher
 from data.JQuantsStockDataFetcher import JQuantsStockDataFetcher
-from data.DataSaver import DataSaver
+from data.DataSaver import DataSaver  # DataSaver クラスのインポート
 
 
 def runner(fetcher):
@@ -29,7 +29,10 @@ def runner(fetcher):
 
     # データをファイルに保存する例
     save_path = os.path.join(save_dir, "stock_data.csv")
-    standardized_data.to_csv(save_path, index=False)
+
+    # DataSaver クラスのインスタンスを作成してデータを保存
+    saver = DataSaver()
+    saver.save_raw_data(standardized_data, save_path)
 
     # データ構造の確認
     print("\nデータの詳細情報 : standardized_data.info()")
@@ -54,14 +57,10 @@ if __name__ == "__main__":
     for _ in range(max_iterations):  # ここでは2回交互に実行します
         if use_jquants:
             print("\n★JQuantsStockDataFetcher★")
-            fetcher = JQuantsStockDataFetcher(
-                "7203", "2023-01-01", "2023-12-31"
-            )  # 株式コードから".T"を削除
+            fetcher = JQuantsStockDataFetcher("7203", "2023-01-01", "2023-12-31")
         else:
             print("\n★YahooFinanceStockDataFetcher★")
-            fetcher = YahooFinanceStockDataFetcher(
-                "7203", "2023-01-01", "2023-12-31"
-            )  # 株式コードから".T"を削除
+            fetcher = YahooFinanceStockDataFetcher("7203", "2023-01-01", "2023-12-31")
         runner(fetcher)  # メソッド名を runner に変更
         # フラグを交互に切り替え
         use_jquants = toggle(use_jquants)
