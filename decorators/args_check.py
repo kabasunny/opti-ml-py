@@ -6,6 +6,7 @@ def args_check(arg_types=(), return_type=None):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
+            # 位置引数の型チェック
             for i, (arg, expected_type) in enumerate(zip(args, arg_types)):
                 if expected_type is None:
                     continue

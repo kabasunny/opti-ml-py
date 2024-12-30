@@ -6,9 +6,10 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.abspath(os.path.join(current_dir, ".."))
 if project_root not in sys.path:
     sys.path.append(project_root)
+
 from data.YahooFinanceStockDataFetcher import YahooFinanceStockDataFetcher
 from data.JQuantsStockDataFetcher import JQuantsStockDataFetcher
-from data.save_data import save_raw_data
+from data.DataSaver import DataSaver
 
 
 def runner(fetcher):
