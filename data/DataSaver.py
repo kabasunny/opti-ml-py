@@ -1,11 +1,11 @@
 import os
 import pandas as pd
-from .decorators import args_check  # デコレータをインポート
+from decorators.ArgsChecker import ArgsChecker  # デコレータクラスをインポート
 
 
 class DataSaver:
-    @args_check((pd.DataFrame, str), None)
-    def save_raw_data(self, data, save_path):
+    @ArgsChecker((pd.DataFrame, str), None)
+    def save_raw_data(self, data, save_path, **kwargs):
         os.makedirs(os.path.dirname(save_path), exist_ok=True)
         data.to_csv(save_path, index=False)
         print(f"Data saved to {save_path}")

@@ -4,11 +4,11 @@ import pandas as pd
 from dotenv import load_dotenv
 from data.StockDataFetcherBase import StockDataFetcherBase
 import time
-from .decorators import args_check  # デコレータをインポート
+from decorators.ArgsChecker import ArgsChecker  # デコレータをインポート
 
 
 class JQuantsStockDataFetcher(StockDataFetcherBase):
-    @args_check((None, str, (str, pd.Timestamp), (str, pd.Timestamp)), None)
+    @ArgsChecker((None, str, (str, pd.Timestamp), (str, pd.Timestamp)), None)
     def __init__(self, symbol, start_date, end_date):
         self.symbol = str(symbol)  # symbol を文字列にキャスト
         self.start_date = (
@@ -23,7 +23,7 @@ class JQuantsStockDataFetcher(StockDataFetcherBase):
         self.refresh_token = self.get_refresh_token()
         self.id_token = self.get_id_token(self.refresh_token)
 
-    @args_check((None,), str)
+    @ArgsChecker((None,), str)
     def get_refresh_token(self):
         email = os.getenv("JQUANTS_EMAIL")
         password = os.getenv("JQUANTS_PASSWORD")
@@ -35,14 +35,14 @@ class JQuantsStockDataFetcher(StockDataFetcherBase):
         response.raise_for_status()
         return response.json().get("refreshToken")
 
-    @args_check((None, str), str)
+    @ArgsChecker((None, str), str)
     def get_id_token(self, refresh_token):
         url = f"https://api.jquants.com/v1/token/auth_refresh?refreshtoken={refresh_token}"
         response = requests.post(url)
         response.raise_for_status()
         return response.json().get("idToken")
 
-    @args_check((None,), pd.DataFrame)
+    @ArgsChecker((None,), pd.DataFrame)
     def fetch_data(self) -> pd.DataFrame:
         url = "https://api.jquants.com/v1/prices/daily_quotes"
         headers = {"Authorization": f"Bearer {self.id_token}"}
@@ -71,7 +71,7 @@ class JQuantsStockDataFetcher(StockDataFetcherBase):
         df = pd.DataFrame(data)
         return df
 
-    @args_check((None, pd.DataFrame), pd.DataFrame)
+    @ArgsChecker((None, pd.DataFrame), pd.DataFrame)
     def standardize_data(self, data: pd.DataFrame) -> pd.DataFrame:
         data = data.rename(
             columns={

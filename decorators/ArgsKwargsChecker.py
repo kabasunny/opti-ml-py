@@ -2,12 +2,17 @@ import pandas as pd
 from functools import wraps
 
 
-def args_kwargs_check(arg_types=(), kwarg_types={}, return_type=None):
-    def decorator(func):
+class ArgsKwargsChecker:
+    def __init__(self, arg_types=(), kwarg_types={}, return_type=None):
+        self.arg_types = arg_types
+        self.kwarg_types = kwarg_types
+        self.return_type = return_type
+
+    def __call__(self, func):
         @wraps(func)
         def wrapper(*args, **kwargs):
             # 位置引数の型チェック
-            for i, (arg, expected_type) in enumerate(zip(args, arg_types)):
+            for i, (arg, expected_type) in enumerate(zip(args, self.arg_types)):
                 if expected_type is None:
                     continue
                 if isinstance(expected_type, tuple):
@@ -22,7 +27,7 @@ def args_kwargs_check(arg_types=(), kwarg_types={}, return_type=None):
                     )
 
             # キーワード引数の型チェック
-            for key, expected_type in kwarg_types.items():
+            for key, expected_type in self.kwarg_types.items():
                 if key in kwargs:
                     arg = kwargs[key]
                     if isinstance(expected_type, tuple):
@@ -38,14 +43,12 @@ def args_kwargs_check(arg_types=(), kwarg_types={}, return_type=None):
 
             result = func(*args, **kwargs)
 
-            if return_type is not None:
-                if not isinstance(result, return_type):
+            if self.return_type is not None:
+                if not isinstance(result, self.return_type):
                     raise TypeError(
-                        f"Return value should be of type {return_type.__name__}, but got {type(result).__name__}"
+                        f"Return value should be of type {self.return_type.__name__}, but got {type(result).__name__}"
                     )
 
             return result
 
         return wrapper
-
-    return decorator
