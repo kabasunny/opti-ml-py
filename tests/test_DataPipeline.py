@@ -1,16 +1,19 @@
+# opti-ml-py\tests\test_DataPipeline.py
 import unittest
 from unittest.mock import MagicMock
 import pandas as pd
 from data.DataPipeline import DataPipeline
 from data.YahooFinanceStockDataFetcher import YahooFinanceStockDataFetcher
-from data.DataSaver import DataSaver
+from data.RawDataManager import RawDataManager
 
 
 class TestDataPipeline(unittest.TestCase):
     def setUp(self):
         # モックのデータフェッチャーとデータセーバーを作成
         self.fetcher = YahooFinanceStockDataFetcher("7203", "2023-01-01", "2023-12-31")
-        self.saver = DataSaver()
+        self.saver = RawDataManager(
+            "data/test/processed_stock_data.csv", "data/raw/demo_stock_data.csv"
+        )
 
         # モックの戻り値を設定
         self.mock_raw_data = pd.DataFrame(
@@ -45,15 +48,16 @@ class TestDataPipeline(unittest.TestCase):
 
     def test_data_pipeline(self):
         pipeline = DataPipeline(self.fetcher, self.saver)
-        pipeline.run("data/test/processed_stock_data.csv")
+        pipeline.run()
 
         # 各メソッドが正しく呼び出されたかを確認
         self.fetcher.fetch_data.assert_called_once()
         self.fetcher.standardize_data.assert_called_once_with(self.mock_raw_data)
-        self.saver.save_raw_data.assert_called_once_with(
-            self.mock_standardized_data, "data/test/processed_stock_data.csv"
-        )
+        self.saver.save_raw_data.assert_called_once_with(self.mock_standardized_data)
 
 
 if __name__ == "__main__":
     unittest.main()
+
+
+# python -m unittest discover -s tests -p "test_DataPipeline.py"

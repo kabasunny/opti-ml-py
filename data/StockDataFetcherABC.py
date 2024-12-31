@@ -1,3 +1,5 @@
+# data\StockDataFetcherABC.py
+# opti-ml-py\data\StockDataFetcherABC.py
 from abc import ABC, abstractmethod
 import pandas as pd
 from decorators.ArgsChecker import ArgsChecker  # デコレータクラスをインポート

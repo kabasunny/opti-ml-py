@@ -1,3 +1,5 @@
+# data\StockData.py
+# opti-ml-py\data\StockData.py
 import pandas as pd
 from decorators.ArgsChecker import ArgsChecker  # デコレータクラスをインポート
 

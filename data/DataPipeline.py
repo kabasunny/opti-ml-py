@@ -1,19 +1,20 @@
+# data\DataPipeline.py
+# opti-ml-py\data\DataPipeline.py
 from decorators.ArgsChecker import ArgsChecker  # デコレータクラスをインポート
 from data.StockDataFetcherABC import StockDataFetcherABC  # 抽象クラスのインポート
-from data.DataSaver import DataSaver  # 抽象クラスのインポート
-from data.DataPipeline import DataPipeline  # 抽象クラスのインポート
+from data.RawDataManager import RawDataManager  # RawDataManager クラスのインポート
 
 
 class DataPipeline:
     @ArgsChecker(
-        (None, StockDataFetcherABC, DataSaver), None
-    )  # fetcherがStockDataFetcherABCを継承し、saverがDataSaverABCであるかチェック
-    def __init__(self, fetcher: StockDataFetcherABC, saver: DataSaver):
+        (None, StockDataFetcherABC, RawDataManager), None
+    )  # fetcherがStockDataFetcherABCを継承し、saverがRawDataManagerであるかチェック
+    def __init__(self, fetcher: StockDataFetcherABC, saver: RawDataManager):
         self.fetcher = fetcher  # データを取得するオブジェクトを設定
         self.saver = saver  # データを保存するオブジェクトを設定
 
-    @ArgsChecker((None, str), None)  # 引数チェックデコレータを適用
-    def run(self, save_path: str):
+    @ArgsChecker((None,), None)  # 引数チェックデコレータを適用
+    def run(self):
         print("Fetching data...")  # データ取得開始のメッセージを表示
         raw_data = self.fetcher.fetch_data()  # データを取得
         print("Standardizing data...")  # データ標準化開始のメッセージを表示
@@ -24,7 +25,7 @@ class DataPipeline:
             )  # データが見つからなかった場合のメッセージを表示
             return  # 処理を終了
         print("Saving data...")  # データ保存開始のメッセージを表示
-        self.saver.save_raw_data(standardized_data, save_path)  # データを保存
+        self.saver.save_raw_data(standardized_data)  # データを保存
         print(
             "Data pipeline completed successfully."
         )  # パイプライン処理完了のメッセージを表示
