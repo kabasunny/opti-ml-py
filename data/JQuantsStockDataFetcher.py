@@ -2,12 +2,12 @@ import os
 import requests
 import pandas as pd
 from dotenv import load_dotenv
-from data.StockDataFetcherBase import StockDataFetcherBase
+from data.StockDataFetcherABC import StockDataFetcherABC
 import time
 from decorators.ArgsChecker import ArgsChecker  # デコレータをインポート
 
 
-class JQuantsStockDataFetcher(StockDataFetcherBase):
+class JQuantsStockDataFetcher(StockDataFetcherABC):
     @ArgsChecker((None, str, (str, pd.Timestamp), (str, pd.Timestamp)), None)
     def __init__(self, symbol, start_date, end_date):
         self.symbol = str(symbol)  # symbol を文字列にキャスト

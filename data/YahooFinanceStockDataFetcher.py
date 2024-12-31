@@ -1,10 +1,10 @@
 import yfinance as yf
 import pandas as pd
-from data.StockDataFetcherBase import StockDataFetcherBase
+from data.StockDataFetcherABC import StockDataFetcherABC
 from decorators.ArgsChecker import ArgsChecker  # デコレータクラスをインポート
 
 
-class YahooFinanceStockDataFetcher(StockDataFetcherBase):
+class YahooFinanceStockDataFetcher(StockDataFetcherABC):
     @ArgsChecker((None, str, (str, pd.Timestamp), (str, pd.Timestamp)), None)
     def __init__(self, symbol, start_date, end_date):
         self.symbol = symbol + ".T"
