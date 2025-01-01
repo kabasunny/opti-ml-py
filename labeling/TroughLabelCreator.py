@@ -2,6 +2,7 @@ import pandas as pd
 from labeling.utils.TroughAndPeakDetector import TroughAndPeakDetector
 from labeling.utils.PeriodBasedTroughSelector import PeriodBasedTroughSelector
 from labeling.utils.PriceBasedTroughSelector import PriceBasedTroughSelector
+from labeling.utils.PeakBasedTroughSelector import PeakBasedTroughSelector
 from labeling.LabelCreatorABC import LabelCreatorABC
 from decorators.ArgsChecker import ArgsChecker  # デコレータクラスをインポート
 
@@ -23,8 +24,8 @@ class TroughLabelCreator(LabelCreatorABC):
         df["date"] = pd.to_datetime(df["date"])
 
         pre_x = 5
-        post_x = 15
-        high_x = 10.0  # high_x を float 型に変換
+        post_x = 20
+        high_x = 8.0  # high_x を float 型に変換
 
         # トラフのインデックスに基づいて選択されたトラフを検出
         selected_period_troughs = (
@@ -33,8 +34,12 @@ class TroughLabelCreator(LabelCreatorABC):
             )
         )
 
-        selected_troughs = PriceBasedTroughSelector.select_troughs_based_on_price(
+        selected_price_troughs = PriceBasedTroughSelector.select_troughs_based_on_price(
             df, selected_period_troughs, high_x
+        )
+
+        selected_troughs = PeakBasedTroughSelector.select_troughs_based_on_peak(
+            df, selected_price_troughs, troughs, peaks, pre_x, high_x
         )
 
         # ラベルを付ける
