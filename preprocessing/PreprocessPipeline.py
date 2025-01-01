@@ -9,45 +9,34 @@ from data.ProcessedDataManager import ProcessedDataManager
 
 
 class PreprocessPipeline:
-    @ArgsChecker((None, str, str), None)
-    def __init__(self, raw_data_path: str, save_path: str):
-        self.raw_data_manager = RawDataManager(
-            load_path=raw_data_path, save_path=raw_data_path
-        )
-        self.processed_data_manager = ProcessedDataManager(save_path=save_path)
-
-    def load_data(self) -> pd.DataFrame:
-        """生データを読み込む"""
-        print("Loading raw data...")
-        df = self.raw_data_manager.load_raw_data()
-        print("Raw data loaded successfully.")
-        return df
-
-    def preprocess_data(self, df: pd.DataFrame) -> pd.DataFrame:
-        """データ前処理を行う"""
-        print("Handling missing values...")
-        df = MissingValueHandler.fill_missing_with_mean(df)
-
-        print("Detecting outliers...")
-        outliers = OutlierDetector.detect_outliers(df)
-        print("Outliers detected:")
-        print(outliers)
-
-        print("Normalizing data...")
-        df = Normalizer.normalize(df)
-
-        return df
-
-    def save_data(self, df: pd.DataFrame):
-        """前処理済みデータを保存する"""
-        print("Saving processed data...")
-        self.processed_data_manager.save_processed_data(df)
-        print("Processed data saved successfully.")
+    @ArgsChecker((None, RawDataManager, ProcessedDataManager), None)
+    def __init__(
+        self,
+        raw_data_manager: RawDataManager,
+        processed_data_manager: ProcessedDataManager,
+    ):
+        self.raw_data_manager = raw_data_manager
+        self.processed_data_manager = processed_data_manager
 
     @ArgsChecker((None,), None)
     def run(self):
         """データパイプラインの実行"""
-        df = self.load_data()
-        df = self.preprocess_data(df)
-        self.save_data(df)
+        # データの読み込み
+        df = self.raw_data_manager.load_raw_data()
+        print("Raw data loaded successfully")
+
+        # データの前処理
+        df = MissingValueHandler.fill_missing_with_mean(df)
+        print("Handled missing values")
+
+        outliers = OutlierDetector.detect_outliers(df)
+        print("Outliers detected")
+
+        df = Normalizer.normalize(df)
+        print("Normalized data")
+
+        # データの保存
+        self.processed_data_manager.save_processed_data(df)
+        print("Processed data saved successfully")
+
         print("Preprocessing pipeline completed successfully.")

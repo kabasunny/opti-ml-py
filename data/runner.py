@@ -1,4 +1,4 @@
-# opti-ml-py\data\runner.py
+# opti-ml-py\labeling\runner.py
 import sys
 import os
 
@@ -20,10 +20,9 @@ def toggle(flag):
 
 
 if __name__ == "__main__":
-    save_path = "data/raw/demo_row_stock_data.csv"
-    load_path = "data/raw/demo_row_stock_data.csv"
+    raw_data_path = "data/raw/demo_row_stock_data.csv"
     data_manager = RawDataManager(
-        save_path, load_path
+        raw_data_path
     )  # RawDataManager クラスのインスタンスを作成
 
     use_jquants = True  # 初期値をTrueに設定

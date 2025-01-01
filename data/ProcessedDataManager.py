@@ -5,22 +5,22 @@ from decorators.ArgsChecker import ArgsChecker  # デコレータクラスをイ
 
 class ProcessedDataManager:
     @ArgsChecker((None, str), None)
-    def __init__(self, save_path: str):
-        self.save_path = save_path
+    def __init__(self, path: str):
+        self.path = path
 
     @ArgsChecker((None, pd.DataFrame), None)
     def save_processed_data(self, data: pd.DataFrame):
         """データを指定されたパスに保存するメソッド"""
-        parent_dir = os.path.dirname(self.save_path)
+        parent_dir = os.path.dirname(self.path)
         os.makedirs(parent_dir, exist_ok=True)
-        data.to_csv(self.save_path, index=False)
-        print(f"Data saved to {self.save_path}")
+        data.to_csv(self.path, index=False)
+        print(f"データが {self.path} に保存されました")
 
-    @ArgsChecker((None, str), pd.DataFrame)
-    def load_processed_data(self, file_path: str) -> pd.DataFrame:
+    @ArgsChecker((None,), pd.DataFrame)
+    def load_processed_data(self) -> pd.DataFrame:
         """指定されたパスからデータを読み込むメソッド"""
-        if not os.path.exists(file_path):
-            raise FileNotFoundError(f"No such file: '{file_path}'")
-        data = pd.read_csv(file_path)
-        print(f"Data loaded from {file_path}")
+        if not os.path.exists(self.path):
+            raise FileNotFoundError(f"ファイルが存在しません: '{self.path}'")
+        data = pd.read_csv(self.path)
+        print(f"データが {self.path} からロードされました")
         return data
