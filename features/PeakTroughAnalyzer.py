@@ -23,9 +23,9 @@ class PeakTroughAnalyzer(FeatureCreatorABC):
 
         # 特徴量名と設定
         feature_configs = {
-            "50d_t_me": {"window_size": 50, "resample": None},
-            "30w_t_me": {"window_size": 30, "resample": "W"},
-            "24m_t_me": {"window_size": 24, "resample": "ME"},
+            "50dtme": {"window_size": 50, "resample": None},
+            "30wtme": {"window_size": 30, "resample": "W"},
+            "24mtme": {"window_size": 24, "resample": "ME"},
         }
 
         # trade_start_date 以降のデータを抽出

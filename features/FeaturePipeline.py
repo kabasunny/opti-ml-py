@@ -34,16 +34,25 @@ class FeaturePipeline:
         """
         # データをロード
         df = self.processed_data_manager.load_processed_data()
+        # print("Loaded data:")
+        # print(df.head())
+        # print(df.info())
 
         # 特徴量を作成
         df_with_features = self.feature_creator.create_all_features(df)
+        # print("Data with features:")
+        # print(df_with_features.head())
+        # print(df_with_features.info())
 
-        # 特徴量を選択
-        selected_features_df = self.feature_selector.select_all_features(
-            df_with_features
-        )
+        # # 特徴量を選択
+        # selected_features_df = self.feature_selector.select_all_features(
+        #     df_with_features
+        # )
+        # print("Selected features:")
+        # print(selected_features_df.head())
+        # print(selected_features_df.info())
 
-        # 特徴量データを保存
-        self.feature_data_manager.save_feature_data(selected_features_df)
+        # # 特徴量データを保存
+        # self.feature_data_manager.save_feature_data(selected_features_df)
 
-        return selected_features_df
+        return df_with_features

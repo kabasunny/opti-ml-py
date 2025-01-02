@@ -6,9 +6,9 @@ from decorators.ArgsChecker import ArgsChecker  # デコレータクラスをイ
 
 class CombinedFeatureSelector:
     def __init__(self):
-        self.selectors = [PCAFeatureSelector(n_components=3)]
+        self.selectors = [PCAFeatureSelector(n_components=10)]
 
-    @ArgsChecker((pd.DataFrame,), pd.DataFrame)
+    @ArgsChecker((None, pd.DataFrame), pd.DataFrame)
     def select_all_features(self, df: pd.DataFrame) -> pd.DataFrame:
         """
         全ての特徴量選択を統合するメソッド

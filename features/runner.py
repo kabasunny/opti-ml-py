@@ -28,6 +28,6 @@ if __name__ == "__main__":
     pipeline = FeaturePipeline(
         processed_data_manager, feature_data_manager, feature_list_str, trade_start_date
     )
-    pipeline.run()
+    print(pipeline.run())
 
     print(f"Feature pipeline executed successfully and feature data saved.")

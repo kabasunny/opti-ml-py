@@ -8,7 +8,13 @@ class PCAFeatureSelector(FeatureSelectorABC):
     def __init__(self, n_components: int):
         self.pca = PCA(n_components=n_components)
 
-    @ArgsChecker((pd.DataFrame,), pd.DataFrame)
+    @ArgsChecker(
+        (
+            None,
+            pd.DataFrame,
+        ),
+        pd.DataFrame,
+    )
     def select_features(self, df: pd.DataFrame) -> pd.DataFrame:
         """
         PCAに基づいて特徴量を選択するメソッド
@@ -19,6 +25,11 @@ class PCAFeatureSelector(FeatureSelectorABC):
         Returns:
             pd.DataFrame: 選択された特徴量のみを含むデータフレーム
         """
-        features = df.drop(columns=["label"])  # 'label' 列を除外して特徴量のみを抽出
+        # 'date' 列を除外して特徴量のみを抽出
+        features = df.drop(columns=["date"])
+
+        # NaN 値を削除または補完（ここでは削除を選択）
+        features = features.dropna()
+
         selected_features = self.pca.fit_transform(features)
         return pd.DataFrame(selected_features)

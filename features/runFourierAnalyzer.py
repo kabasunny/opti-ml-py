@@ -28,13 +28,5 @@ analyzer = FourierAnalyzer()
 df_with_features = analyzer.create_features(df, trade_start_date)
 
 # 特徴量が正しく追加されたかを再確認
-print(
-    df_with_features[
-        ["date", "close", "ff_0", "ff_1", "ff_2", "ff_3", "ff_4", "ff_5", "ff_6"]
-    ].head(40)
-)
-print(
-    df_with_features[
-        ["date", "close", "ff_0", "ff_1", "ff_2", "ff_3", "ff_4", "ff_5", "ff_6"]
-    ].tail(40)
-)
+print(df_with_features[["date", "close", "ff2", "ff3", "ff4"]].head(10))
+print(df_with_features[["date", "close", "ff2", "ff3", "ff4"]].tail(10))

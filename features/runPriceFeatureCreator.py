@@ -8,11 +8,9 @@ if project_root not in sys.path:
     sys.path.append(project_root)
 
 import pandas as pd
-import numpy as np
-from scipy.signal import find_peaks
-from features.PeakTroughAnalyzer import (
-    PeakTroughAnalyzer,
-)  # PeakTroughAnalyzerクラスをインポート
+from features.PriceFeatureCreator import (
+    PriceFeatureCreator,
+)  # PriceFeatureCreatorクラスをインポート
 
 # データを準備する
 data_path = os.path.join(project_root, "data/processed/demo_processed_stock_data.csv")
@@ -22,12 +20,12 @@ df["date"] = pd.to_datetime(df["date"])  # 日付をdatetime型に変換
 # trade_start_date を設定
 trade_start_date = pd.Timestamp("2023-08-01")
 
-# PeakTroughAnalyzerクラスのインスタンスを作成
-analyzer = PeakTroughAnalyzer()
+# PriceFeatureCreatorクラスのインスタンスを作成
+creator = PriceFeatureCreator()
 
 # 特徴量を作成
-df_with_features = analyzer.create_features(df, trade_start_date)
+df_with_features = creator.create_features(df, trade_start_date)
 
 # 特徴量が正しく追加されたかを再確認
-print(df_with_features[["date", "close", "50dtme", "30wtme", "24mtme"]].head(10))
-print(df_with_features[["date", "close", "50dtme", "30wtme", "24mtme"]].tail(10))
+print(df_with_features[["date", "close", "sma10", "sma30", "bb_up", "bb_low"]].head(10))
+print(df_with_features[["date", "close", "sma10", "sma30", "bb_up", "bb_low"]].tail(10))

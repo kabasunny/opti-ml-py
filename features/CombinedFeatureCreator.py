@@ -22,7 +22,7 @@ class CombinedFeatureCreator:
         ]
         self.trade_start_date = trade_start_date
 
-    @ArgsChecker((pd.DataFrame,), pd.DataFrame)
+    @ArgsChecker((None, pd.DataFrame), pd.DataFrame)
     def create_all_features(self, df: pd.DataFrame) -> pd.DataFrame:
         """
         全ての特徴量を作成するメソッド
@@ -33,9 +33,25 @@ class CombinedFeatureCreator:
         Returns:
             pd.DataFrame: 全ての特徴量が追加されたデータフレーム
         """
-        # trade_start_date 以降の日付のデータをフィルタリング
-        df = df[df["date"] >= self.trade_start_date].copy()
+        # dateカラムをTimestamp型に変換
+        df["date"] = pd.to_datetime(df["date"])
+
+        # 元のデータフレームを保持しながら特徴量を追加
+        df_features = df.copy()
 
         for analyzer in self.analyzers:
-            df = analyzer.create_features(df, self.trade_start_date)
-        return df
+            df_temp = analyzer.create_features(df, self.trade_start_date)
+            df_features = df_features.join(
+                df_temp.set_index("date"),
+                on="date",
+                rsuffix=f"_{analyzer.__class__.__name__}",
+            )
+            # print(f"Data with features: {analyzer}")
+            # print(df_features.head())
+            # print(df_features.tail())
+            # print(df_features.info())
+
+        # trade_start_date 以降の日付のデータをフィルタリング
+        df_features = df_features[df_features["date"] >= self.trade_start_date].copy()
+
+        return df_features

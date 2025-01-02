@@ -21,8 +21,8 @@ class FourierAnalyzer(FeatureCreatorABC):
             pd.DataFrame: 特徴量が追加されたデータフレーム
         """
         # 特徴量列を初期化
-        for i in range(0, 7):
-            df[f"ff_{i}"] = np.nan
+        for i in range(2, 5):  # ff2, ff3, ff4 のみを初期化
+            df[f"ff{i}"] = np.nan
 
         # フーリエ変換を行う関数
         def fft_analysis(prices):
@@ -43,7 +43,7 @@ class FourierAnalyzer(FeatureCreatorABC):
             # 上位6つの支配的な周期を取得
             return sorted_periods[:6]
 
-        # `trade_start_date`のインデックスを取得
+        # `trade_start_date` のインデックスを取得
         start_idx = df.index[df["date"] >= trade_start_date][0]
 
         # 各日付に対してフーリエ特徴量を計算
@@ -56,7 +56,9 @@ class FourierAnalyzer(FeatureCreatorABC):
             dominant_periods = fft_analysis(window_data.values)
 
             # 結果を格納
-            for i, period in enumerate(dominant_periods):
-                df.at[idx, f"ff_{i}"] = period
+            for i, period in enumerate(
+                dominant_periods[2:5]
+            ):  # ff2, ff3, ff4 のみを格納
+                df.at[idx, f"ff{i + 2}"] = period
 
         return df[df["date"] >= trade_start_date]
