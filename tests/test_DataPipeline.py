@@ -2,7 +2,7 @@
 import unittest
 from unittest.mock import MagicMock
 import pandas as pd
-from data.DataPipeline import DataPipeline
+from data.RawDataPipeline import RawDataPipeline
 from data.YahooFinanceStockDataFetcher import YahooFinanceStockDataFetcher
 from data.RawDataManager import RawDataManager
 
@@ -47,7 +47,7 @@ class TestDataPipeline(unittest.TestCase):
         self.saver.save_raw_data = MagicMock()
 
     def test_data_pipeline(self):
-        pipeline = DataPipeline(self.fetcher, self.saver)
+        pipeline = RawDataPipeline(self.fetcher, self.saver)
         pipeline.run()
 
         # 各メソッドが正しく呼び出されたかを確認

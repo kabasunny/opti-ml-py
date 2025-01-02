@@ -1,60 +1,48 @@
-# opti-ml-py\main.py
-import os
+import pandas as pd
 
 from data.YahooFinanceStockDataFetcher import YahooFinanceStockDataFetcher
-from data.JQuantsStockDataFetcher import JQuantsStockDataFetcher
+from data.RawDataManager import RawDataManager
+from data.ProcessedDataManager import ProcessedDataManager
+from data.LabelDataManager import LabelDataManager
+
+from data.RawDataPipeline import RawDataPipeline
+from preprocessing.PreprocessPipeline import PreprocessPipeline
+from labeling.LabelCreationPipeline import LabelCreationPipeline
+from labeling.TroughLabelCreator import TroughLabelCreator
 
 
-def main(fetcher):
-    raw_data = fetcher.fetch_data()
-    standardized_data = fetcher.standardize_data(raw_data)
-    if standardized_data.empty:
-        print("No data found for the specified parameters.")
-        return
+def main():
+    symbol = "7203"
+    trade_start_date = pd.Timestamp("2023-08-01")
+    before_period_days = 366 * 2  # スタート日より、さかのぼって1年間のデータを取得
+    data_start_period = trade_start_date - pd.DateOffset(days=before_period_days)
+    end_date = pd.Timestamp("today")
 
-    print("Daily data:")
-    print(standardized_data.head())
+    raw_data_path = "data/raw/demo_row_stock_data.csv"
+    raw_data_manager = RawDataManager(raw_data_path)
 
-    # 保存先ディレクトリの確認と作成
-    save_dir = "data/test"
-    if not os.path.exists(save_dir):
-        os.makedirs(save_dir)
+    processed_data_path = "data/processed/demo_processed_stock_data.csv"
+    processed_data_manager = ProcessedDataManager(processed_data_path)
 
-    # データをファイルに保存する例
-    save_path = os.path.join(save_dir, "stock_data.csv")
-    standardized_data.to_csv(save_path, index=False)
+    label_data_path = "data/label/demo_labels.csv"
+    label_data_manager = LabelDataManager(label_data_path)
 
-    # データ構造の確認
-    print("\nデータの詳細情報 : standardized_data.info()")
-    print(standardized_data.info())
+    print("★ DataPipeline ★")
+    fetcher = YahooFinanceStockDataFetcher(symbol, data_start_period, end_date)
+    # DataPipeline クラスのインスタンスを作成し、データパイプラインを実行
+    RawDataPipeline(fetcher, raw_data_manager).run()
 
-    print("\nデータの基本統計量 : standardized_data.describe()")
-    print(standardized_data.describe())
+    print("★ PreprocessPipeline ★")
+    # PreprocessPipeline のインスタンスを作成し、引数としてデータマネージャを渡す
+    PreprocessPipeline(raw_data_manager, processed_data_manager).run()
 
-    print("\nデータのカラム名 : standardized_data.columns")
-    print(standardized_data.columns)
-
-
-# フラグを交互に切り替える関数
-def toggle_use_jquants(flag):
-    return not flag
+    print("★ LabelCreationPipeline ★")
+    label_creator = TroughLabelCreator(
+        trade_start_date
+    )  # トラフラベルクリエータークラス
+    # LabelCreationPipeline のインスタンスを作成し、実行
+    LabelCreationPipeline(raw_data_manager, label_data_manager, label_creator).run()
 
 
 if __name__ == "__main__":
-    # 環境変数や設定ファイルを使用して実装クラスを切り替え
-    use_jquants = True  # 初期値をTrueに設定
-    max_iterations = 2  # 最大ループ回数を設定
-    for _ in range(max_iterations):  # ここでは2回交互に実行します
-        if use_jquants:
-            print("\n★JQuantsStockDataFetcher★")
-            fetcher = JQuantsStockDataFetcher(
-                "7203", "2023-01-01", "2023-12-31"
-            )  # 株式コードから".T"を削除
-        else:
-            print("\n★YahooFinanceStockDataFetcher★")
-            fetcher = YahooFinanceStockDataFetcher(
-                "7203", "2023-01-01", "2023-12-31"
-            )  # 株式コードから".T"を削除
-        main(fetcher)
-        # フラグを交互に切り替え
-        use_jquants = toggle_use_jquants(use_jquants)
+    main()

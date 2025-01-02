@@ -1,6 +1,6 @@
-# opti-ml-py\labeling\runner.py
 import sys
 import os
+import pandas as pd  # trade_start_date のために必要
 
 # プロジェクトのルートディレクトリを sys.path に追加
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -20,7 +20,11 @@ if __name__ == "__main__":
     # RawDataManager と LabelDataManager のインスタンスを作成
     raw_data_manager = RawDataManager(raw_data_path)
     label_data_manager = LabelDataManager(label_data_path)
-    label_creator = TroughLabelCreator()  # トラフラベルクリエータークラス
+
+    trade_start_date = pd.Timestamp("2023-08-01")  # ここで trade_start_date を定義
+    label_creator = TroughLabelCreator(
+        trade_start_date
+    )  # トラフラベルクリエータークラス
 
     # LabelCreationPipeline のインスタンスを作成し、実行
     pipeline = LabelCreationPipeline(

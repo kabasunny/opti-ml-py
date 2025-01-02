@@ -8,20 +8,26 @@ from decorators.ArgsChecker import ArgsChecker  # デコレータクラスをイ
 
 
 class TroughLabelCreator(LabelCreatorABC):
+    def __init__(self, trade_start_date: pd.Timestamp):
+        self.trade_start_date = trade_start_date
+
     @ArgsChecker((None, pd.DataFrame), pd.DataFrame)
     def create_labels(self, df: pd.DataFrame) -> pd.DataFrame:
         """
         日足の終値が週足トラフと同じ値であるものをラベル付けする関数
         """
+        # 日付列をTimestamp型に変換
+        df["date"] = pd.to_datetime(df["date"])
+
+        # trade_start_date 以降の日付のデータをフィルタリング
+        df = df[df["date"] >= self.trade_start_date].copy()
+
         # トラフおよびピークを検出
         troughs = TroughAndPeakDetector.detect_troughs(df["close"])
         peaks = TroughAndPeakDetector.detect_peaks(df["close"])
 
         # ラベル列を初期化
-        df["label"] = 0
-
-        # 日付列をTimestamp型に変換
-        df["date"] = pd.to_datetime(df["date"])
+        df.loc[:, "label"] = 0
 
         pre_x = 5
         post_x = 20

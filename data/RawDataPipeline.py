@@ -4,7 +4,7 @@ from data.StockDataFetcherABC import StockDataFetcherABC  # 抽象クラスの�
 from data.RawDataManager import RawDataManager  # RawDataManager クラスのインポート
 
 
-class DataPipeline:
+class RawDataPipeline:
     @ArgsChecker(
         (None, StockDataFetcherABC, RawDataManager), None
     )  # fetcherがStockDataFetcherABCを継承し、saverがRawDataManagerであるかチェック
