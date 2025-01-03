@@ -1,19 +1,17 @@
-# preprocessing\PreprocessPipeline.py
 import pandas as pd
 from decorators.ArgsChecker import ArgsChecker
 from preprocessing.MissingValueHandler import MissingValueHandler
 from preprocessing.OutlierDetector import OutlierDetector
 from preprocessing.Normalizer import Normalizer
-from data.RawDataManager import RawDataManager
-from data.ProcessedDataManager import ProcessedDataManager
+from data.DataManager import DataManager
 
 
 class PreprocessPipeline:
-    @ArgsChecker((None, RawDataManager, ProcessedDataManager), None)
+    @ArgsChecker((None, DataManager, DataManager), None)
     def __init__(
         self,
-        raw_data_manager: RawDataManager,
-        processed_data_manager: ProcessedDataManager,
+        raw_data_manager: DataManager,
+        processed_data_manager: DataManager,
     ):
         self.raw_data_manager = raw_data_manager
         self.processed_data_manager = processed_data_manager
@@ -22,7 +20,7 @@ class PreprocessPipeline:
     def run(self):
         """データパイプラインの実行"""
         # データの読み込み
-        df = self.raw_data_manager.load_raw_data()
+        df = self.raw_data_manager.load_data()
         print("Raw data loaded successfully")
 
         # データの前処理
@@ -32,11 +30,15 @@ class PreprocessPipeline:
         outliers = OutlierDetector.detect_outliers(df)
         print("Outliers detected")
 
-        df = Normalizer.normalize(df)
+        # 正規化する列を指定
+        columns_to_normalize = ["open", "high", "low", "close", "volume"]
+
+        # 正規化の適用
+        df = Normalizer.normalize(df, columns_to_normalize)
         print("Normalized data")
 
         # データの保存
-        self.processed_data_manager.save_processed_data(df)
+        self.processed_data_manager.save_data(df)
         print("Processed data saved successfully")
 
         print("Preprocessing pipeline completed successfully.")

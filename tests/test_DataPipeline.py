@@ -4,14 +4,14 @@ from unittest.mock import MagicMock
 import pandas as pd
 from data.RawDataPipeline import RawDataPipeline
 from data.YahooFinanceStockDataFetcher import YahooFinanceStockDataFetcher
-from data.RawDataManager import RawDataManager
+from data.RawDataManager import DataManager
 
 
 class TestDataPipeline(unittest.TestCase):
     def setUp(self):
         # モックのデータフェッチャーとデータセーバーを作成
         self.fetcher = YahooFinanceStockDataFetcher("7203", "2023-01-01", "2023-12-31")
-        self.saver = RawDataManager(
+        self.saver = DataManager(
             "data/test/processed_stock_data.csv", "data/raw/demo_stock_data.csv"
         )
 

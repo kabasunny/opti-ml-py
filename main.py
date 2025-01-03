@@ -1,9 +1,11 @@
 import pandas as pd
 
 from data.YahooFinanceStockDataFetcher import YahooFinanceStockDataFetcher
-from data.RawDataManager import RawDataManager
-from data.ProcessedDataManager import ProcessedDataManager
-from data.LabelDataManager import LabelDataManager
+
+# from data.RawDataManager import DataManager
+# from data.DataManager import DataManager
+# from data.DataManager import DataManager
+from data.DataManager import DataManager
 
 from data.RawDataPipeline import RawDataPipeline
 from preprocessing.PreprocessPipeline import PreprocessPipeline
@@ -18,14 +20,17 @@ def main():
     data_start_period = trade_start_date - pd.DateOffset(days=before_period_days)
     end_date = pd.Timestamp("today")
 
+    # API から取得した株価データを保存するファイルパス
     raw_data_path = "data/raw/demo_row_stock_data.csv"
-    raw_data_manager = RawDataManager(raw_data_path)
+    raw_data_manager = DataManager(raw_data_path)
 
+    # 前処理済みの株価データを保存するファイルパス
     processed_data_path = "data/processed/demo_processed_stock_data.csv"
-    processed_data_manager = ProcessedDataManager(processed_data_path)
+    processed_data_manager = DataManager(processed_data_path)
 
+    # ラベルデータを保存するファイルパス
     label_data_path = "data/label/demo_labels.csv"
-    label_data_manager = LabelDataManager(label_data_path)
+    label_data_manager = DataManager(label_data_path)
 
     print("★ DataPipeline ★")
     fetcher = YahooFinanceStockDataFetcher(symbol, data_start_period, end_date)

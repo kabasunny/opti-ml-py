@@ -9,7 +9,7 @@ if project_root not in sys.path:
     sys.path.append(project_root)
 
 from LabelCreationPipeline import LabelCreationPipeline
-from data.RawDataManager import RawDataManager
+from data.RawDataManager import DataManager
 from data.LabelDataManager import LabelDataManager
 from labeling.TroughLabelCreator import TroughLabelCreator
 
@@ -18,7 +18,7 @@ if __name__ == "__main__":
     label_data_path = "data/label/demo_labels.csv"
 
     # RawDataManager と LabelDataManager のインスタンスを作成
-    raw_data_manager = RawDataManager(raw_data_path)
+    raw_data_manager = DataManager(raw_data_path)
     label_data_manager = LabelDataManager(label_data_path)
 
     trade_start_date = pd.Timestamp("2023-08-01")  # ここで trade_start_date を定義

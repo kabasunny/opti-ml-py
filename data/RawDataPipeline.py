@@ -1,14 +1,14 @@
 # opti-ml-py\data\DataPipeline.py
 from decorators.ArgsChecker import ArgsChecker  # デコレータクラスをインポート
 from data.StockDataFetcherABC import StockDataFetcherABC  # 抽象クラスのインポート
-from data.RawDataManager import RawDataManager  # RawDataManager クラスのインポート
+from data.DataManager import DataManager  # DataManager クラスのインポート
 
 
 class RawDataPipeline:
     @ArgsChecker(
-        (None, StockDataFetcherABC, RawDataManager), None
+        (None, StockDataFetcherABC, DataManager), None
     )  # fetcherがStockDataFetcherABCを継承し、saverがRawDataManagerであるかチェック
-    def __init__(self, fetcher: StockDataFetcherABC, saver: RawDataManager):
+    def __init__(self, fetcher: StockDataFetcherABC, saver: DataManager):
         self.fetcher = fetcher  # データを取得するオブジェクトを設定
         self.saver = saver  # データを保存するオブジェクトを設定
 
@@ -26,7 +26,7 @@ class RawDataPipeline:
             )  # データが見つからなかった場合のメッセージを表示
             return  # 処理を終了
 
-        self.saver.save_raw_data(standardized_data)  # データを保存
+        self.saver.save_data(standardized_data)  # データを保存
         print("Data saving completed.")  # データ保存完了のメッセージを表示
 
         print(

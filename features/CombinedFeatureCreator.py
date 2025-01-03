@@ -36,22 +36,14 @@ class CombinedFeatureCreator:
         # dateカラムをTimestamp型に変換
         df["date"] = pd.to_datetime(df["date"])
 
-        # 元のデータフレームを保持しながら特徴量を追加
-        df_features = df.copy()
-
         for analyzer in self.analyzers:
-            df_temp = analyzer.create_features(df, self.trade_start_date)
-            df_features = df_features.join(
-                df_temp.set_index("date"),
-                on="date",
-                rsuffix=f"_{analyzer.__class__.__name__}",
-            )
+            df = analyzer.create_features(df, self.trade_start_date)
             # print(f"Data with features: {analyzer}")
-            # print(df_features.head())
-            # print(df_features.tail())
-            # print(df_features.info())
+            # print(df.head())
+            # print(df.tail())
+            # print(df.info())
 
         # trade_start_date 以降の日付のデータをフィルタリング
-        df_features = df_features[df_features["date"] >= self.trade_start_date].copy()
+        df = df[df["date"] >= self.trade_start_date].copy()
 
-        return df_features
+        return df

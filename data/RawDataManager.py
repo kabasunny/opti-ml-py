@@ -3,7 +3,7 @@ import pandas as pd
 from decorators.ArgsChecker import ArgsChecker  # デコレータクラスをインポート
 
 
-class RawDataManager:
+class DataManager:
     @ArgsChecker((None, str), None)
     def __init__(self, path: str):
         self.path = path

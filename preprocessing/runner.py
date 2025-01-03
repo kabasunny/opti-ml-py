@@ -9,16 +9,15 @@ if project_root not in sys.path:
     sys.path.append(project_root)
 
 from PreprocessPipeline import PreprocessPipeline
-from data.RawDataManager import RawDataManager
-from data.ProcessedDataManager import ProcessedDataManager
+from data.DataManager import DataManager
 
 if __name__ == "__main__":
     raw_data_path = "data/raw/demo_row_stock_data.csv"
     processed_data_path = "data/processed/demo_processed_stock_data.csv"
 
     # RawDataManager と ProcessedDataManager のインスタンスを作成
-    raw_data_manager = RawDataManager(raw_data_path)
-    processed_data_manager = ProcessedDataManager(processed_data_path)
+    raw_data_manager = DataManager(raw_data_path)
+    processed_data_manager = DataManager(processed_data_path)
 
     # PreprocessPipeline のインスタンスを作成し、引数としてデータマネージャを渡す
     pipeline = PreprocessPipeline(raw_data_manager, processed_data_manager)

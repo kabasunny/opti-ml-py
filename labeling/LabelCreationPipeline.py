@@ -1,13 +1,12 @@
 # opti-ml-py\labeling\LabelCreationPipeline.py
 import pandas as pd
 from decorators.ArgsChecker import ArgsChecker
-from data.LabelDataManager import LabelDataManager
-from data.RawDataManager import RawDataManager
+from data.DataManager import DataManager
 from labeling.LabelCreatorABC import LabelCreatorABC
 
 
 class LabelCreationPipeline:
-    @ArgsChecker((None, RawDataManager, LabelDataManager, LabelCreatorABC), None)
+    @ArgsChecker((None, DataManager, DataManager, LabelCreatorABC), None)
     def __init__(self, raw_data_manager, label_data_manager, label_creator):
         self.raw_data_manager = raw_data_manager
         self.label_data_manager = label_data_manager
@@ -17,7 +16,7 @@ class LabelCreationPipeline:
     def run(self):
         """データパイプラインの実行"""
         # データの読み込み
-        df = self.raw_data_manager.load_raw_data()
+        df = self.raw_data_manager.load_data()
         print("Raw data loaded successfully")
 
         # ラベルの作成
@@ -25,7 +24,7 @@ class LabelCreationPipeline:
         print("Labels created")
 
         # ラベルデータの保存
-        self.label_data_manager.save_label_data(labels)
+        self.label_data_manager.save_data(labels)
         print("Labels saved successfully")
 
         print("Label creation pipeline completed successfully.")

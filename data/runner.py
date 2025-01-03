@@ -11,7 +11,7 @@ if project_root not in sys.path:
 import pandas as pd
 from data.YahooFinanceStockDataFetcher import YahooFinanceStockDataFetcher
 from data.JQuantsStockDataFetcher import JQuantsStockDataFetcher
-from data.RawDataManager import RawDataManager  # RawDataManager クラスのインポート
+from data.RawDataManager import DataManager  # RawDataManager クラスのインポート
 from data.RawDataPipeline import RawDataPipeline  # DataPipeline クラスのインポート
 
 
@@ -28,7 +28,7 @@ if __name__ == "__main__":
     end_date = pd.Timestamp("today")
 
     raw_data_path = "data/raw/demo_row_stock_data.csv"
-    data_manager = RawDataManager(
+    data_manager = DataManager(
         raw_data_path
     )  # RawDataManager クラスのインスタンスを作成
 

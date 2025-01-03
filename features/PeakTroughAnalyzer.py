@@ -20,19 +20,12 @@ class PeakTroughAnalyzer(FeatureCreatorABC):
         Returns:
             pd.DataFrame: 特徴量が追加されたデータフレーム
         """
-
         # 特徴量名と設定
         feature_configs = {
             "50dtme": {"window_size": 50, "resample": None},
             "30wtme": {"window_size": 30, "resample": "W"},
             "24mtme": {"window_size": 24, "resample": "ME"},
         }
-
-        # trade_start_date 以降のデータを抽出
-        df_filtered = df[df["date"] >= trade_start_date].copy()
-        if df_filtered.empty:
-            print("指定された trade_start_date 以降のデータがありません。")
-            return df
 
         # 特徴量列を初期化
         for feature_name in feature_configs:
@@ -47,8 +40,8 @@ class PeakTroughAnalyzer(FeatureCreatorABC):
             if resample_rule:
                 data = data.set_index("date").resample(resample_rule).last()
 
-            for idx in range(len(df_filtered)):
-                current_date = df_filtered.iloc[idx]["date"]
+            for idx in range(len(df)):
+                current_date = df.iloc[idx]["date"]
 
                 # 現在のウィンドウを取得
                 if resample_rule:
@@ -60,7 +53,7 @@ class PeakTroughAnalyzer(FeatureCreatorABC):
                         print(f"データが見つかりません: {current_date}")
                         continue
                 else:
-                    window_end_idx = df_filtered.index[idx]
+                    window_end_idx = df.index[idx]
 
                 window_start_idx = max(0, window_end_idx - window_size)
                 window_data = data.iloc[window_start_idx:window_end_idx]
@@ -83,10 +76,5 @@ class PeakTroughAnalyzer(FeatureCreatorABC):
         for feature_name, config in feature_configs.items():
             calculate_feature(df, feature_name, config)
 
-        # # 結果を確認
-        # print(df[["date", "close"] + list(feature_configs.keys())].head(10))
-        # print(df[["date", "close"] + list(feature_configs.keys())].tail(10))
-
-        # trade_start_date 以降のデータを返却
-        df_filtered_with_features = df[df["date"] >= trade_start_date].copy()
-        return df_filtered_with_features
+        # フィルタリングせずに戻す
+        return df

@@ -22,7 +22,5 @@ class VolumeFeatureCreator(FeatureCreatorABC):
         df["vsma10"] = df["volume"].rolling(window=10).mean()
         df["vsma30"] = df["volume"].rolling(window=30).mean()
 
-        # trade_start_date 以降のデータをフィルタリング
-        df_filtered = df[df["date"] >= trade_start_date].copy()
-
-        return df_filtered
+        # フィルタリングせずに戻す
+        return df

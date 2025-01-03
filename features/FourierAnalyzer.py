@@ -61,4 +61,4 @@ class FourierAnalyzer(FeatureCreatorABC):
             ):  # ff2, ff3, ff4 のみを格納
                 df.at[idx, f"ff{i + 2}"] = period
 
-        return df[df["date"] >= trade_start_date]
+        return df

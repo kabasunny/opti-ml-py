@@ -24,7 +24,5 @@ class PriceFeatureCreator(FeatureCreatorABC):
         df["bb_up"] = df["sma10"] + 2 * df["close"].rolling(window=10).std()
         df["bb_low"] = df["sma10"] - 2 * df["close"].rolling(window=10).std()
 
-        # trade_start_date 以降のデータをフィルタリング
-        df_filtered = df[df["date"] >= trade_start_date].copy()
-
-        return df_filtered
+        # フィルタリングせずに戻す
+        return df

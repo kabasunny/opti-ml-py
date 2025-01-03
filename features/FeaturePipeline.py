@@ -1,31 +1,46 @@
 import pandas as pd
 from features.CombinedFeatureCreator import CombinedFeatureCreator
-from features.CombinedFeatureSelector import CombinedFeatureSelector
+from selectores.CombinedFeatureSelector import CombinedFeatureSelector
+from preprocessing.Normalizer import Normalizer  # Normalizerクラスをインポート
 from decorators.ArgsChecker import ArgsChecker  # デコレータクラスをインポート
-from data.ProcessedDataManager import ProcessedDataManager
-from data.FeatureDataManager import FeatureDataManager
+from data.DataManager import DataManager
+from features.PeakTroughAnalyzer import PeakTroughAnalyzer
+from features.FourierAnalyzer import FourierAnalyzer
+from features.VolumeFeatureCreator import VolumeFeatureCreator
+from features.PriceFeatureCreator import PriceFeatureCreator
 
 
 class FeaturePipeline:
     @ArgsChecker(
-        (None, ProcessedDataManager, FeatureDataManager, list, pd.Timestamp), None
+        (None, DataManager, DataManager, DataManager, list, pd.Timestamp), None
     )
     def __init__(
         self,
-        processed_data_manager: ProcessedDataManager,
-        feature_data_manager: FeatureDataManager,
+        processed_data_manager: DataManager,
+        feature_data_manager: DataManager,
+        normalized_f_d_manager: DataManager,
         feature_list_str: list,
         trade_start_date: pd.Timestamp,
     ):
-        self.feature_creator = CombinedFeatureCreator(
-            feature_list_str, trade_start_date
-        )
-        self.feature_selector = CombinedFeatureSelector()
+        self.normalizer = Normalizer()  # Normalizerクラスのインスタンスを作成
         self.processed_data_manager = processed_data_manager
         self.feature_data_manager = feature_data_manager
+        self.normalized_f_d_manager = normalized_f_d_manager
+        analyzer_mapping = {
+            "peak_trough": PeakTroughAnalyzer,
+            "fourier": FourierAnalyzer,
+            "volume": VolumeFeatureCreator,
+            "price": PriceFeatureCreator,
+        }
+        self.analyzers = [
+            analyzer_mapping[feature]()
+            for feature in feature_list_str
+            if feature in analyzer_mapping
+        ]
+        self.trade_start_date = trade_start_date
 
-    @ArgsChecker((None,), pd.DataFrame)
-    def run(self) -> pd.DataFrame:
+    @ArgsChecker((None,), None)
+    def run(self):
         """
         特徴量作成と選択を一連の流れで実行するメソッド
 
@@ -33,26 +48,49 @@ class FeaturePipeline:
             pd.DataFrame: 選択された特徴量のみを含むデータフレーム
         """
         # データをロード
-        df = self.processed_data_manager.load_processed_data()
-        # print("Loaded data:")
-        # print(df.head())
-        # print(df.info())
+        df = self.processed_data_manager.load_data()
 
         # 特徴量を作成
-        df_with_features = self.feature_creator.create_all_features(df)
-        # print("Data with features:")
-        # print(df_with_features.head())
+        # dateカラムをTimestamp型に変換
+        df["date"] = pd.to_datetime(df["date"])
+
+        for analyzer in self.analyzers:
+            df = analyzer.create_features(df, self.trade_start_date)
+            # print(f"Data with features: {analyzer}")
+            # print(df.head())
+            # print(df.tail())
+            # print(df.info())
+
+        # trade_start_date 以降の日付のデータをフィルタリング
+        df_with_features = df[df["date"] >= self.trade_start_date].copy()
+        print("Data with features:")
+        print(df_with_features.head())
         # print(df_with_features.info())
 
-        # # 特徴量を選択
-        # selected_features_df = self.feature_selector.select_all_features(
-        #     df_with_features
-        # )
-        # print("Selected features:")
-        # print(selected_features_df.head())
-        # print(selected_features_df.info())
+        self.feature_data_manager.save_data(df_with_features)
 
-        # # 特徴量データを保存
-        # self.feature_data_manager.save_feature_data(selected_features_df)
+        # 正規化する列を指定
+        columns_to_normalize = [
+            "50dtme",
+            "30wtme",
+            "24mtme",
+            "ff2",
+            "ff3",
+            "ff4",
+            "vsma10",
+            "vsma30",
+            "sma10",
+            "sma30",
+            "bb_up",
+            "bb_low",
+        ]
 
-        return df_with_features
+        # 特徴量を正規化
+        df_normalized = self.normalizer.normalize(
+            df_with_features, columns_to_normalize
+        )
+        print("Data with df_normalized:")
+        print(df_normalized.head())
+        # print(df_normalized.info())
+
+        self.normalized_f_d_manager.save_data(df_normalized)
