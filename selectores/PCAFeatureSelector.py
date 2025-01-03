@@ -1,10 +1,20 @@
 import pandas as pd
 from sklearn.decomposition import PCA
-from selectores.FeatureSelectorABC import FeatureSelectorABC
+from selectores.UnsupervisedFeatureSelectorABC import UnsupervisedFeatureSelectorABC
 from decorators.ArgsChecker import ArgsChecker  # デコレータクラスをインポート
 
 
-class PCAFeatureSelector:
+class PCAFeatureSelector(UnsupervisedFeatureSelectorABC):
+    """
+    PCAFeatureSelectorクラスは、主成分分析（PCA）に基づいて特徴量を選択するためのクラス。
+    元の高次元データを低次元の主成分に変換し、データの分散を最大限に保持しながら、重要な特徴量を抽出します。
+
+    Attributes:
+        pca (PCA): PCAモデル
+        feature_names (list): 選択された特徴量の名前
+    """
+
+    @ArgsChecker((None, int), None)
     def __init__(self, n_components: int):
         self.pca = PCA(n_components=n_components)
         self.feature_names = None
@@ -20,16 +30,15 @@ class PCAFeatureSelector:
         Returns:
             pd.DataFrame: 選択された特徴量のみを含むデータフレーム
         """
-        features = df.drop(columns=["date", "symbol"])  # 'date'と'symbol'列を除外
-        self.pca.fit(features)
-        selected_features = self.pca.transform(features)
+        self.pca.fit(df)
+        selected_features = self.pca.transform(df)
         self.feature_names = [f"PC{i+1}" for i in range(selected_features.shape[1])]
 
-        # 主成分の寄与度を表示
-        loadings = pd.DataFrame(
-            self.pca.components_.T, columns=self.feature_names, index=features.columns
-        )
-        print("PCA Loadings (各主成分への寄与度):")
-        print(loadings)
+        # # 主成分の寄与度を表示
+        # loadings = pd.DataFrame(
+        #     self.pca.components_.T, columns=self.feature_names, index=df.columns
+        # )
+        # print("PCA Loadings (各主成分への寄与度):")
+        # print(loadings)
 
         return pd.DataFrame(selected_features, columns=self.feature_names)

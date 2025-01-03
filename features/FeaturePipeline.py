@@ -1,13 +1,8 @@
 import pandas as pd
-from features.CombinedFeatureCreator import CombinedFeatureCreator
 from selectores.CombinedFeatureSelector import CombinedFeatureSelector
 from preprocessing.Normalizer import Normalizer  # Normalizerクラスをインポート
 from decorators.ArgsChecker import ArgsChecker  # デコレータクラスをインポート
 from data.DataManager import DataManager
-from features.PeakTroughAnalyzer import PeakTroughAnalyzer
-from features.FourierAnalyzer import FourierAnalyzer
-from features.VolumeFeatureCreator import VolumeFeatureCreator
-from features.PriceFeatureCreator import PriceFeatureCreator
 
 
 class FeaturePipeline:
@@ -19,24 +14,14 @@ class FeaturePipeline:
         processed_data_manager: DataManager,
         feature_data_manager: DataManager,
         normalized_f_d_manager: DataManager,
-        feature_list_str: list,
+        analyzers: list,
         trade_start_date: pd.Timestamp,
     ):
         self.normalizer = Normalizer()  # Normalizerクラスのインスタンスを作成
         self.processed_data_manager = processed_data_manager
         self.feature_data_manager = feature_data_manager
         self.normalized_f_d_manager = normalized_f_d_manager
-        analyzer_mapping = {
-            "peak_trough": PeakTroughAnalyzer,
-            "fourier": FourierAnalyzer,
-            "volume": VolumeFeatureCreator,
-            "price": PriceFeatureCreator,
-        }
-        self.analyzers = [
-            analyzer_mapping[feature]()
-            for feature in feature_list_str
-            if feature in analyzer_mapping
-        ]
+        self.analyzers = analyzers
         self.trade_start_date = trade_start_date
 
     @ArgsChecker((None,), None)
@@ -63,8 +48,8 @@ class FeaturePipeline:
 
         # trade_start_date 以降の日付のデータをフィルタリング
         df_with_features = df[df["date"] >= self.trade_start_date].copy()
-        print("Data with features:")
-        print(df_with_features.head())
+        # print("Data with features:")
+        # print(df_with_features.head())
         # print(df_with_features.info())
 
         self.feature_data_manager.save_data(df_with_features)
@@ -89,8 +74,8 @@ class FeaturePipeline:
         df_normalized = self.normalizer.normalize(
             df_with_features, columns_to_normalize
         )
-        print("Data with df_normalized:")
-        print(df_normalized.head())
+        # print("Data with df_normalized:")
+        # print(df_normalized.head())
         # print(df_normalized.info())
 
         self.normalized_f_d_manager.save_data(df_normalized)

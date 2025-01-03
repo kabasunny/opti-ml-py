@@ -8,36 +8,36 @@ project_root = os.path.abspath(os.path.join(current_dir, ".."))
 if project_root not in sys.path:
     sys.path.append(project_root)
 
-from selectores.PCAFeatureSelector import PCAFeatureSelector
+from selectores.CorrelationFeatureSelector import CorrelationFeatureSelector
 
 
-def runPCAFeatureSelector(data_path: str, n_components: int = 3):
+def runCorrelationFeatureSelector(data_path: str, threshold: float = 0.9):
     """
-    PCAFeatureSelector の動作を確認するための関数
+    CorrelationFeatureSelector の動作を確認するための関数
 
     Args:
         data_path (str): データファイルのパス
-        n_components (int): 主成分の数
+        threshold (float): 相関の閾値
     """
     # データを準備する
     df = pd.read_csv(data_path)
     print("Original DataFrame:")
     print(df.head(10))
 
-    # Unnamed: 0 列をインデックスとして扱い、削除
+    # Unnamed: 0 列を削除
     if "Unnamed: 0" in df.columns:
         df = df.drop(columns=["Unnamed: 0"])
 
     df["date"] = pd.to_datetime(df["date"])  # 日付をdatetime型に変換
 
-    # 不要な列を取り除く
+    # 不要な列を削除
     df = df.drop(columns=["date", "symbol", "open", "high", "low", "close", "volume"])
 
-    # PCAセレクターのインスタンスを作成
-    pca_selector = PCAFeatureSelector(n_components=n_components)
+    # CorrelationFeatureSelectorのインスタンスを作成
+    correlation_selector = CorrelationFeatureSelector(threshold=threshold)
 
     # 特徴量を選択
-    selected_features_df = pca_selector.select_features(df)
+    selected_features_df = correlation_selector.select_features(df)
 
     # インデックスをリセット
     selected_features_df.reset_index(drop=True, inplace=True)
@@ -50,4 +50,4 @@ def runPCAFeatureSelector(data_path: str, n_components: int = 3):
 # 実行例
 if __name__ == "__main__":
     data_path = "data/processed/demo_normalized_feature_data.csv"
-    runPCAFeatureSelector(data_path, n_components=3)
+    runCorrelationFeatureSelector(data_path, threshold=0.9)
