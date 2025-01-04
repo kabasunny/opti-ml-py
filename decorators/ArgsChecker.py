@@ -29,7 +29,20 @@ class ArgsChecker:
             result = func(*args, **kwargs)
 
             if self.return_type is not None:
-                if not isinstance(result, self.return_type):
+                if isinstance(self.return_type, tuple):
+                    if not isinstance(result, tuple):
+                        raise TypeError(
+                            f"Return value should be of type tuple, but got {type(result).__name__}"
+                        )
+                    if not all(
+                        isinstance(r, t) for r, t in zip(result, self.return_type)
+                    ):
+                        raise TypeError(
+                            f"Elements of return value tuple should be of types "
+                            f"{[t.__name__ for t in self.return_type]}, but got "
+                            f"{[type(r).__name__ for r in result]}"
+                        )
+                elif not isinstance(result, self.return_type):
                     raise TypeError(
                         f"Return value should be of type {self.return_type.__name__}, but got {type(result).__name__}"
                     )
