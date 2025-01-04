@@ -27,7 +27,7 @@ class YahooFinanceStockDataFetcher(StockDataFetcherABC):
         return data
 
     @ArgsChecker((None, pd.DataFrame), pd.DataFrame)
-    def standardize_data(self, data: pd.DataFrame) -> pd.DataFrame:
+    def format_data(self, data: pd.DataFrame) -> pd.DataFrame:
         data = data.reset_index()
         # シンボルから .T を除外
         data["symbol"] = self.symbol.replace(".T", "")

@@ -74,7 +74,7 @@ class JQuantsStockDataFetcher(StockDataFetcherABC):
         return df
 
     @ArgsChecker((None, pd.DataFrame), pd.DataFrame)
-    def standardize_data(self, data: pd.DataFrame) -> pd.DataFrame:
+    def format_data(self, data: pd.DataFrame) -> pd.DataFrame:
         data = data.rename(
             columns={
                 "Date": "date",

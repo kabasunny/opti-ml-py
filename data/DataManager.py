@@ -14,17 +14,17 @@ class DataManager:
         try:
             os.makedirs(os.path.dirname(self.path), exist_ok=True)
             df.to_csv(self.path, index=True)
-            print(f"データが {self.path} に保存されました")
+            # print(f"データが {self.path} に保存されました")
         except Exception as e:
-            print(f"データ保存に失敗しました: {e}")
+            print(f"{self.path}のデータ保存に失敗しました: {e}")
 
     @ArgsChecker((None,), pd.DataFrame)
     def load_data(self) -> pd.DataFrame:
         """ラベルデータをロードするメソッド"""
         try:
             df = pd.read_csv(self.path, index_col=0)
-            print(f"データが {self.path} からロードされました")
+            # print(f"データが {self.path} からロードされました")
             return df
         except Exception as e:
-            print(f"データロードに失敗しました: {e}")
+            print(f"{self.path}のデータロードに失敗しました: {e}")
             return pd.DataFrame()

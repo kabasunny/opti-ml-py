@@ -35,5 +35,5 @@ class LassoFeatureSelector(SupervisedFeatureSelectorABC):
         # Lasso回帰を適用
         self.lasso.fit(features, target)
         selected_features = features.columns[self.lasso.coef_ != 0]
-
-        return df[selected_features]
+        selected_df = df[selected_features]
+        return selected_df

@@ -15,5 +15,5 @@ class StockDataFetcherABC(ABC):
     @ArgsChecker(
         (None, pd.DataFrame), pd.DataFrame
     )  # standardize_dataメソッドの引数と戻り値の型チェック
-    def standardize_data(self, data: pd.DataFrame) -> pd.DataFrame:
+    def format_data(self, data: pd.DataFrame) -> pd.DataFrame:
         pass

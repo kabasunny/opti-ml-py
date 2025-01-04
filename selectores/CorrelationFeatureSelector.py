@@ -38,4 +38,5 @@ class CorrelationFeatureSelector(UnsupervisedFeatureSelectorABC):
             if any(upper_triangle[column] > self.threshold)
         ]
         selected_features = df.drop(columns=to_drop, axis=1)
-        return selected_features
+        selected_df = selected_features
+        return selected_df

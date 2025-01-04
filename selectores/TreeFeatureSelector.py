@@ -15,8 +15,10 @@ class TreeFeatureSelector(SupervisedFeatureSelectorABC):
     """
 
     @ArgsChecker((None, int), None)
-    def __init__(self, n_estimators: int = 100):
-        self.model = RandomForestClassifier(n_estimators=n_estimators)
+    def __init__(self, n_estimators: int = 100, random_state: int = 42):
+        self.model = RandomForestClassifier(
+            n_estimators=n_estimators, random_state=random_state
+        )
 
     @ArgsChecker((None, pd.DataFrame, str), pd.DataFrame)
     def select_features(self, df: pd.DataFrame, target_column: str) -> pd.DataFrame:
@@ -37,4 +39,5 @@ class TreeFeatureSelector(SupervisedFeatureSelectorABC):
         self.model.fit(features, target)
         importances = self.model.feature_importances_
         selected_features = features.columns[importances > np.mean(importances)]
-        return df[selected_features]
+        selected_df = df[selected_features]
+        return selected_df

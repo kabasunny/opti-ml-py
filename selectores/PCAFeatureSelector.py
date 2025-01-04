@@ -34,11 +34,5 @@ class PCAFeatureSelector(UnsupervisedFeatureSelectorABC):
         selected_features = self.pca.transform(df)
         self.feature_names = [f"PC{i+1}" for i in range(selected_features.shape[1])]
 
-        # # 主成分の寄与度を表示
-        # loadings = pd.DataFrame(
-        #     self.pca.components_.T, columns=self.feature_names, index=df.columns
-        # )
-        # print("PCA Loadings (各主成分への寄与度):")
-        # print(loadings)
-
-        return pd.DataFrame(selected_features, columns=self.feature_names)
+        selected_df = pd.DataFrame(selected_features, columns=self.feature_names)
+        return selected_df
