@@ -1,4 +1,3 @@
-# opti-ml-py\models\ModelFactory.py
 from models.LightGBMModel import LightGBMModel
 from models.RandomForestModel import RandomForestModel
 from models.XGBoostModel import XGBoostModel
@@ -13,8 +12,9 @@ from models.BaseModelABC import BaseModelABC
 
 
 class ModelFactory:
+    @staticmethod
     @ArgsChecker((None, str), BaseModelABC)
-    def create_model(self, model_type: str) -> BaseModelABC:
+    def create_model(model_type: str) -> BaseModelABC:
         if model_type == "lightgbm":
             return LightGBMModel()
         elif model_type == "rand_frst":
@@ -34,6 +34,7 @@ class ModelFactory:
         else:
             raise ValueError(f"Unsupported model type: {model_type}")
 
+    @staticmethod
     @ArgsChecker((None, list), list)
-    def create_models(self, model_types: list[str]) -> list[BaseModelABC]:
-        return [self.create_model(model_type) for model_type in model_types]
+    def create_models(model_types: list[str]) -> list[BaseModelABC]:
+        return [ModelFactory.create_model(model_type) for model_type in model_types]

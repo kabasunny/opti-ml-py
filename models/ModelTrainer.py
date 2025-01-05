@@ -1,29 +1,50 @@
-# opti-ml-py\models\ModelTrainer.py
+from typing import List, Tuple
 import pandas as pd
-from typing import List
 from decorators.ArgsChecker import ArgsChecker
 from models.BaseModelABC import BaseModelABC
 
 
 class ModelTrainer:
     @staticmethod
-    @ArgsChecker(
-        (List[BaseModelABC], pd.DataFrame, pd.Series, pd.DataFrame, pd.Series),
-        List[BaseModelABC],
-    )
     def train(
         models: List[BaseModelABC],
         X_train: pd.DataFrame,
         y_train: pd.Series,
         X_test: pd.DataFrame,
         y_test: pd.Series,
-    ) -> List[BaseModelABC]:
+    ) -> Tuple[List[BaseModelABC], pd.DataFrame]:
+        results = []
+        trained_models = []
+        model_names = []  # モデルの名前を格納するリスト
         for model in models:
-            model.train(X_train, y_train, X_test, y_test)
-        return models
+            trained_model, result = model.train(X_train, y_train, X_test, y_test)
+            trained_models.append(trained_model)
+            results.append(result)
+            model_names.append(
+                type(model).__name__.replace("Model", "")
+            )  # "Model" を除去
+        results_df = pd.DataFrame(
+            results,
+            columns=["Accuracy", "Precision", "Recall", "F1"],
+            index=model_names,
+        )
+        return trained_models, results_df
 
     @staticmethod
-    @ArgsChecker((List[BaseModelABC], pd.DataFrame, pd.Series), None)
-    def evaluate(models: List[BaseModelABC], X_test: pd.DataFrame, y_test: pd.Series):
+    def evaluate(
+        models: List[BaseModelABC], X_test: pd.DataFrame, y_test: pd.Series
+    ) -> pd.DataFrame:
+        results = []
+        model_names = []  # モデルの名前を格納するリスト
         for model in models:
-            model.evaluate(X_test, y_test)
+            result = model.evaluate(X_test, y_test)
+            results.append(result)
+            model_names.append(
+                type(model).__name__.replace("Model", "")
+            )  # "Model" を除去
+        results_df = pd.DataFrame(
+            results,
+            columns=["Accuracy", "Precision", "Recall", "F1"],
+            index=model_names,
+        )
+        return results_df

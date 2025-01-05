@@ -10,17 +10,35 @@ from selectores.SelectorPipeline import SelectorPipeline
 from data.DataForModelPipeline import DataForModelPipeline
 from features.AnalyzerFactory import AnalyzerFactory
 from selectores.SelectorFactory import SelectorFactory
+from models.ModelTrainPipeline import ModelTrainPipeline
+from models.ModelSaverLoader import ModelSaverLoader
+from models.ModelFactory import ModelFactory
 
 
 def main():
+
+    # 学習シミュレーション条件
     symbol = "7203"
     trade_start_date = pd.Timestamp("2023-08-01")
     before_period_days = 366 * 2  # スタート日より、さかのぼって2年間のデータを取得
     data_start_period = trade_start_date - pd.DateOffset(days=before_period_days)
     end_date = pd.Timestamp("today").strftime("%Y-%m-%d")
 
+    # 学習用モデル
+    model_types = [
+        "lightgbm",
+        "rand_frst",
+        "xgboost",
+        "catboost",
+        "adaboost",
+        "svm",
+        "knn",
+        "logc_regr",
+    ]
+
     # データ保存ディレクトリのベースパスと拡張子を指定
     base_data_path = "data/stock_data"
+    model_base_path = "models/trained_models"
     file_ext = "parquet"  # CSVの代わりにparquetを使用 Goで使用可能
 
     # パス生成用関数
@@ -37,6 +55,13 @@ def main():
     training_test_d_p = generate_path("training_and_test", symbol, end_date, file_ext)
     practical_d_p = generate_path("practical", symbol, end_date, file_ext)
 
+    # モデルの保存パスを生成
+    save_paths = [
+        generate_path(model_base_path, model_type, end_date, "pkl")
+        for model_type in model_types
+    ]
+
+    # データマネージャのインスタンスを作成
     raw_data_manager = DataManager(raw_data_path)
     prsd_d_m = DataManager(processed_data_path)
     l_d_m = DataManager(label_data_path)
@@ -45,6 +70,12 @@ def main():
     s_f_d_m = DataManager(selected_f_d_path)
     tr_tt_d_m = DataManager(training_test_d_p)
     prcl_d_m = DataManager(practical_d_p)
+
+    # モデルのインスタンスを作成
+    models = ModelFactory().create_models(model_types)
+
+    # モデルセーブローダーのインスタンスを作成
+    model_saver_loader = ModelSaverLoader(save_paths)
 
     # ----------------------pipeline----------------------
     print("★ DataPipeline ★")
@@ -77,6 +108,8 @@ def main():
         tr_tt_d_m,
         prcl_d_m,
     ).run()
+    print("★ ModelTrainPipeline ★")
+    ModelTrainPipeline(tr_tt_d_m, models, model_saver_loader).run()
 
 
 if __name__ == "__main__":

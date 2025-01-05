@@ -10,31 +10,19 @@ if project_root not in sys.path:
 
 import pandas as pd
 from data.DataManager import DataManager
-from models.ModelPipeline import ModelPipeline
+from models.ModelTrainPipeline import ModelTrainPipeline
 from models.ModelSaverLoader import ModelSaverLoader
 from models.ModelFactory import ModelFactory
 
 
-def runner(symbol, end_date):
+def runner():
     # データ保存ディレクトリのベースパスと拡張子を指定
+    symbol = "7203"
     base_data_path = "data/stock_data"
     model_base_path = "models"
     file_ext = "parquet"  # CSVの代わりにparquetを使用
+    end_date = pd.Timestamp("today").strftime("%Y-%m-%d")
 
-    # パス生成用関数
-    def generate_path(base_path, sub_dir, symbol, end_date, extension):
-        return os.path.join(base_path, sub_dir, f"{symbol}_{end_date}.{extension}")
-
-    # 各パイプラインのデータ保存パス
-    training_and_test_data_path = generate_path(
-        base_data_path, "training_and_test", symbol, end_date, file_ext
-    )
-
-    # データマネージャのインスタンスを作成
-    training_and_test_data_manager = DataManager(training_and_test_data_path)
-
-    # モデルの作成とトレーニング
-    model_factory = ModelFactory()
     model_types = [
         "lightgbm",
         "rand_frst",
@@ -45,29 +33,33 @@ def runner(symbol, end_date):
         "knn",
         "logc_regr",
     ]
-    models = model_factory.create_models(model_types)
 
-    # モデルセーブローダーのインスタンス作成
-    saver_loader = ModelSaverLoader()
+    # パス生成用関数
+    def generate_path(base_data_path, sub_dir, symbol, end_date, extension):
+        return f"{base_data_path}/{sub_dir}/{symbol}_{end_date}.{extension}"
 
-    # モデルパイプラインの作成と実行
-    model_pipeline = ModelPipeline(training_and_test_data_manager, models, saver_loader)
-    model_pipeline.extract_data()
-    model_pipeline.train_models()
-
+    # 各パイプラインのデータ保存パス
+    training_and_test_data_path = generate_path(
+        base_data_path, "training_and_test", symbol, end_date, file_ext
+    )
     # モデルの保存パスを生成
     save_paths = [
         generate_path(model_base_path, "trained_models", model_type, end_date, "pkl")
         for model_type in model_types
     ]
-    model_pipeline.save_models(save_paths)
 
-    # モデルのロードと再評価
-    model_pipeline.load_models(save_paths)
+    # データマネージャのインスタンスを作成
+    training_and_test_data_manager = DataManager(training_and_test_data_path)
+
+    # モデルの作成とトレーニング
+    models = ModelFactory.create_models(model_types)
+
+    # モデルセーブローダーのインスタンス作成
+    saver_loader = ModelSaverLoader(save_paths)
+
+    # モデルパイプラインの作成と実行
+    ModelTrainPipeline(training_and_test_data_manager, models, saver_loader).run()
 
 
 if __name__ == "__main__":
-    symbol = "7203"
-    end_date = pd.Timestamp("today").strftime("%Y-%m-%d")  # 今日の日付
-
-    runner(symbol, end_date)
+    runner()
