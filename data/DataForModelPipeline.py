@@ -1,9 +1,9 @@
-from DataPreparation import DataPreparation
+from data.DataForModelPreparation import DataPreparation
 from decorators.ArgsChecker import ArgsChecker  # デコレータクラスをインポート
 from data.DataManager import DataManager
 
 
-class PrepareDataForModelPipeline:
+class DataForModelPipeline:
     @ArgsChecker(
         (
             None,
@@ -15,7 +15,7 @@ class PrepareDataForModelPipeline:
             DataManager,
         ),
         None,
-    )  # 型チェックを追加
+    )
     def __init__(
         self,
         processed_data_manager,
@@ -32,8 +32,10 @@ class PrepareDataForModelPipeline:
         self.training_and_test_data_manager = training_and_test_data_manager
         self.practical_data_manager = practical_data_manager
 
-    @ArgsChecker((), None)  # 型チェックを追加
+    @ArgsChecker((), None)
     def run(self):
+        print("Run Data For Model Pipeline")
+
         # ラベル付きのデータを作成する
         full_data = DataPreparation.create_full_data(
             self.processed_data_manager,
@@ -65,3 +67,5 @@ class PrepareDataForModelPipeline:
 
         # 実践テストデータを保存
         self.practical_data_manager.save_data(practical_data)
+
+        print("Data For Model Pipeline completed successfully")

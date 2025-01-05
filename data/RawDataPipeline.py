@@ -14,7 +14,7 @@ class RawDataPipeline:
 
     @ArgsChecker((None,), None)  # 引数チェックデコレータを適用
     def run(self):
-        print("Run Data pipeline completed successfully")
+        print("Run Data pipeline")
         raw_data = self.fetcher.fetch_data()  # データを取得
         # print("Data fetching completed.")  # データ取得完了のメッセージを表示
 

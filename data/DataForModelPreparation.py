@@ -1,4 +1,3 @@
-from functools import wraps
 import pandas as pd
 from decorators.ArgsChecker import ArgsChecker
 from data.DataManager import DataManager
@@ -41,7 +40,7 @@ class DataPreparation:
     @ArgsChecker(
         (pd.DataFrame, pd.DataFrame),
         (pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame),
-    )  # 新しいメソッドの型を追加
+    )
     def split_data_for_modeling(correct_data, incorrect_data):
         # コレクトデータをランダムに二つに分割
         correct_data_train_eval = correct_data.sample(frac=0.8, random_state=42)
@@ -63,7 +62,7 @@ class DataPreparation:
         )
 
     @staticmethod
-    @ArgsChecker((pd.DataFrame, pd.DataFrame), pd.DataFrame)  # 新しいメソッドの型を追加
+    @ArgsChecker((pd.DataFrame, pd.DataFrame), pd.DataFrame)
     def prepare_training_and_test_data(
         correct_data_train_eval, incorrect_data_train_eval
     ):
@@ -104,5 +103,12 @@ class DataPreparation:
         practical_data = pd.concat(
             [correct_data_practical_test, incorrect_data_practical_test]
         )
-        practical_data["data"] = "practical_test"
+        practical_data["label"] = 1
+        practical_data.loc[
+            practical_data.index.isin(incorrect_data_practical_test.index), "label"
+        ] = 0
+        # 'label' 列を一番右に移動
+        practical_data = practical_data[
+            [col for col in practical_data.columns if col != "label"] + ["label"]
+        ]
         return practical_data

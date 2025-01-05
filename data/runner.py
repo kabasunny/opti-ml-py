@@ -11,7 +11,7 @@ if project_root not in sys.path:
 import pandas as pd
 from data.YahooFinanceStockDataFetcher import YahooFinanceStockDataFetcher
 from data.JQuantsStockDataFetcher import JQuantsStockDataFetcher
-from data.RawDataManager import DataManager  # RawDataManager クラスのインポート
+from data.DataManager import DataManager  # RawDataManager クラスのインポート
 from data.RawDataPipeline import RawDataPipeline  # DataPipeline クラスのインポート
 
 

@@ -1,6 +1,7 @@
 # opti-ml-py\decorators\ArgsChecker.py
 import pandas as pd
 from functools import wraps
+from typing import get_origin, get_args
 
 
 class ArgsChecker:
@@ -15,33 +16,45 @@ class ArgsChecker:
             for i, (arg, expected_type) in enumerate(zip(args, self.arg_types)):
                 if expected_type is None:
                     continue
-                if isinstance(expected_type, tuple):
-                    if not any(isinstance(arg, t) for t in expected_type):
+                origin = get_origin(expected_type)
+                if origin:
+                    if not isinstance(arg, origin):
                         raise TypeError(
-                            f"Argument {i} should be of type one of {[t.__name__ for t in expected_type]}, "
+                            f"Argument {i} should be of type {origin.__name__}, "
                             f"but got {type(arg).__name__}"
                         )
-                elif not isinstance(arg, expected_type):
-                    raise TypeError(
-                        f"Argument {i} is of type {type(arg).__name__} but should be {expected_type.__name__}"
-                    )
+                    for arg_item, expected_arg_type in zip(
+                        arg, get_args(expected_type)
+                    ):
+                        if not isinstance(arg_item, expected_arg_type):
+                            raise TypeError(
+                                f"Elements of argument {i} should be of type {expected_arg_type.__name__}, "
+                                f"but got {type(arg_item).__name__}"
+                            )
+                else:
+                    if not isinstance(arg, expected_type):
+                        raise TypeError(
+                            f"Argument {i} is of type {type(arg).__name__} but should be {expected_type.__name__}"
+                        )
 
             result = func(*args, **kwargs)
 
             if self.return_type is not None:
-                if isinstance(self.return_type, tuple):
-                    if not isinstance(result, tuple):
+                origin = get_origin(self.return_type)
+                if origin:
+                    if not isinstance(result, origin):
                         raise TypeError(
-                            f"Return value should be of type tuple, but got {type(result).__name__}"
+                            f"Return value should be of type {origin.__name__}, "
+                            f"but got {type(result).__name__}"
                         )
-                    if not all(
-                        isinstance(r, t) for r, t in zip(result, self.return_type)
+                    for result_item, expected_return_type in zip(
+                        result, get_args(self.return_type)
                     ):
-                        raise TypeError(
-                            f"Elements of return value tuple should be of types "
-                            f"{[t.__name__ for t in self.return_type]}, but got "
-                            f"{[type(r).__name__ for r in result]}"
-                        )
+                        if not isinstance(result_item, expected_return_type):
+                            raise TypeError(
+                                f"Elements of return value should be of type {expected_return_type.__name__}, "
+                                f"but got {type(result_item).__name__}"
+                            )
                 elif not isinstance(result, self.return_type):
                     raise TypeError(
                         f"Return value should be of type {self.return_type.__name__}, but got {type(result).__name__}"
