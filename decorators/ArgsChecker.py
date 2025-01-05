@@ -1,7 +1,7 @@
 # opti-ml-py\decorators\ArgsChecker.py
 import pandas as pd
 from functools import wraps
-from typing import get_origin, get_args
+from typing import get_origin, get_args, Any, Tuple
 
 
 class ArgsChecker:
@@ -47,8 +47,16 @@ class ArgsChecker:
                             f"Return value should be of type {origin.__name__}, "
                             f"but got {type(result).__name__}"
                         )
+                    result_args = get_args(self.return_type)
+                    for result_item, expected_return_type in zip(result, result_args):
+                        if not isinstance(result_item, expected_return_type):
+                            raise TypeError(
+                                f"Elements of return value should be of type {expected_return_type}, "
+                                f"but got {type(result_item).__name__}"
+                            )
+                elif isinstance(self.return_type, tuple):
                     for result_item, expected_return_type in zip(
-                        result, get_args(self.return_type)
+                        result, self.return_type
                     ):
                         if not isinstance(result_item, expected_return_type):
                             raise TypeError(
