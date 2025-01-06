@@ -1,9 +1,13 @@
 # opti-ml-py\models\Evaluator.py
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
+# from decorators.ArgsChecker import ArgsChecker
+# from models.BaseModelABC import BaseModelABC
+
 
 class Evaluator:
     @staticmethod
+    # @ArgsChecker((BaseModelABC), (float, float, float, float))
     def evaluate_model(model, X_test, y_test):
 
         y_pred = model.predict(X_test)
@@ -17,9 +21,9 @@ class Evaluator:
         recall = recall_score(y_test, y_pred, zero_division=0)
         f1 = f1_score(y_test, y_pred, zero_division=0)
 
-        model_name = type(model).__name__.replace(
-            "Classifier", ""
-        )  # 'Classifier' を削除
+        # model_name = type(model).__name__.replace(
+        #     "Classifier", ""
+        # )  # 'Classifier' を削除
         # print(f"[{model_name}] トレーニング修了時のテスト結果")
         # print(f"Accuracy: {accuracy:.4f}")
         # print(f"Precision: {precision:.4f}")

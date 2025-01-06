@@ -24,7 +24,7 @@ class BaseModelABC(ABC):
         pass
 
     @abstractmethod
-    @ArgsChecker((None, pd.DataFrame), pd.Series)
+    # @ArgsChecker((None, pd.DataFrame), pd.Series)
     def predict(self, X_test: pd.DataFrame) -> Any:
         pass
 

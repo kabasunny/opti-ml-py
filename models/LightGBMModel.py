@@ -23,10 +23,6 @@ class LightGBMModel(BaseModelABC):
         }
         self.model = None
 
-    # @ArgsChecker(
-    #     (None, pd.DataFrame, pd.Series, pd.DataFrame, pd.Series),
-    #     Tuple["BaseModelABC", Tuple[float, float, float, float]],
-    # )
     def train(
         self,
         X_train: pd.DataFrame,
@@ -42,9 +38,7 @@ class LightGBMModel(BaseModelABC):
             valid_sets=[lgb_eval],
             num_boost_round=1000,
             callbacks=[
-                lgb.early_stopping(
-                    stopping_rounds=100, verbose=False
-                ),  # verbose=False を追加
+                lgb.early_stopping(stopping_rounds=100, verbose=False),
                 lgb.log_evaluation(0),
             ],
         )
@@ -52,12 +46,12 @@ class LightGBMModel(BaseModelABC):
         return self, result
 
     @ArgsChecker((None, pd.DataFrame), pd.Series)
-    def predict(self, X_test: pd.DataFrame) -> Any:
-        return self.model.predict(X_test)
+    def predict(self, X_test: pd.DataFrame) -> pd.Series:
+        predictions = self.model.predict(X_test)
+        binary_predictions = (predictions >= 0.5).astype(int)
+        return pd.Series(binary_predictions)
 
-    # @ArgsChecker((None, pd.DataFrame, pd.Series), Tuple[float, float, float, float])
     def evaluate(
         self, X_test: pd.DataFrame, y_test: pd.Series
     ) -> Tuple[float, float, float, float]:
-        result = Evaluator.evaluate_model(self.model, X_test, y_test)
-        return result
+        return Evaluator.evaluate_model(self, X_test, y_test)

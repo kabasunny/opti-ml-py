@@ -49,6 +49,17 @@ class FeaturePipeline:
 
         # trade_start_date 以降の日付のデータをフィルタリング
         df_with_features = df[df["date"] >= self.trade_start_date].copy()
+
+        # 指定された列を削除
+        columns_to_drop = [
+            "open",
+            "high",
+            "low",
+            "close",
+            "volume",
+        ]
+        df_with_features.drop(columns=columns_to_drop, inplace=True)
+
         # print("Data with features:")
         # print(df_with_features.head())
         # print(df_with_features.info())

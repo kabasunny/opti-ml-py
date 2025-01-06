@@ -13,6 +13,7 @@ from selectores.SelectorFactory import SelectorFactory
 from models.ModelTrainPipeline import ModelTrainPipeline
 from models.ModelSaverLoader import ModelSaverLoader
 from models.ModelFactory import ModelFactory
+from models.ModelPredictPipeline import ModelPredictPipeline
 
 
 def main():
@@ -24,42 +25,24 @@ def main():
     data_start_period = trade_start_date - pd.DateOffset(days=before_period_days)
     end_date = pd.Timestamp("today").strftime("%Y-%m-%d")
 
-    # 学習用モデル
-    model_types = [
-        "lightgbm",
-        "rand_frst",
-        "xgboost",
-        "catboost",
-        "adaboost",
-        "svm",
-        "knn",
-        "logc_regr",
-    ]
-
+    # ----------------------data----------------------
     # データ保存ディレクトリのベースパスと拡張子を指定
     base_data_path = "data/stock_data"
-    model_base_path = "models/trained_models"
     file_ext = "parquet"  # CSVの代わりにparquetを使用 Goで使用可能
 
-    # パス生成用関数
-    def generate_path(sub_dir, symbol, end_date, extension):
-        return f"{base_data_path}/{sub_dir}/{symbol}_{end_date}.{extension}"
+    # 各パイプラインのデータ保存パス作成
+    def generate_path(data_name):
+        return f"{base_data_path}/{data_name}/{symbol}_{end_date}.{file_ext}"
 
-    # 各パイプラインのデータ保存パス
-    raw_data_path = generate_path("formated_raw", symbol, end_date, file_ext)
-    processed_data_path = generate_path("processed_raw", symbol, end_date, file_ext)
-    label_data_path = generate_path("labeled", symbol, end_date, file_ext)
-    feature_data_path = generate_path("feature", symbol, end_date, file_ext)
-    normalized_f_d_path = generate_path("normalized_ft", symbol, end_date, file_ext)
-    selected_f_d_path = generate_path("selected_ft", symbol, end_date, file_ext)
-    training_test_d_p = generate_path("training_and_test", symbol, end_date, file_ext)
-    practical_d_p = generate_path("practical", symbol, end_date, file_ext)
-
-    # モデルの保存パスを生成
-    save_paths = [
-        generate_path(model_base_path, model_type, end_date, "pkl")
-        for model_type in model_types
-    ]
+    raw_data_path = generate_path("formated_raw")
+    processed_data_path = generate_path("processed_raw")
+    label_data_path = generate_path("labeled")
+    feature_data_path = generate_path("feature")
+    normalized_f_d_path = generate_path("normalized_ft")
+    selected_f_d_path = generate_path("selected_ft")
+    training_test_d_p = generate_path("training_and_test")
+    practical_d_p = generate_path("practical")
+    predictions_save_path = generate_path("predictions")
 
     # データマネージャのインスタンスを作成
     raw_data_manager = DataManager(raw_data_path)
@@ -70,12 +53,25 @@ def main():
     s_f_d_m = DataManager(selected_f_d_path)
     tr_tt_d_m = DataManager(training_test_d_p)
     prcl_d_m = DataManager(practical_d_p)
+    pred_d_m = DataManager(predictions_save_path)
 
-    # モデルのインスタンスを作成
-    models = ModelFactory().create_models(model_types)
-
+    # ----------------------model----------------------
+    # 学習用モデル
+    model_types = [
+        "LightGBM",
+        "RandomForest",
+        "XGBoost",
+        "CatBoost",
+        "AdaBoost",
+        "SVM",
+        "KNeighbors",
+        "LogisticRegression",
+    ]
+    models = ModelFactory.create_models(model_types)
+    model_save_path = "models/trained_models"
+    model_file_ext = "pkl"
     # モデルセーブローダーのインスタンスを作成
-    model_saver_loader = ModelSaverLoader(save_paths)
+    model_saver_loader = ModelSaverLoader(model_save_path, model_file_ext)
 
     # ----------------------pipeline----------------------
     print("★ DataPipeline ★")
@@ -101,7 +97,6 @@ def main():
     SelectorPipeline(l_d_m, n_f_d_m, s_f_d_m, selectors).run()
     print("★ DataForModelPipeline ★")
     DataForModelPipeline(
-        prsd_d_m,
         l_d_m,
         f_d_m,
         s_f_d_m,
@@ -110,6 +105,13 @@ def main():
     ).run()
     print("★ ModelTrainPipeline ★")
     ModelTrainPipeline(tr_tt_d_m, models, model_saver_loader).run()
+    print("★ ModelPredictPipeline ★")
+    ModelPredictPipeline(
+        model_saver_loader,
+        prcl_d_m,
+        pred_d_m,
+        model_types,
+    ).run()
 
 
 if __name__ == "__main__":

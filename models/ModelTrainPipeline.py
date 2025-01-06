@@ -7,7 +7,7 @@ from data.DataManager import DataManager
 
 
 class ModelTrainPipeline:
-    @ArgsChecker((None, DataManager, list, ModelSaverLoader), None)
+    @ArgsChecker((None, DataManager, list[BaseModelABC], ModelSaverLoader), None)
     def __init__(
         self,
         training_and_test_manager: DataManager,
@@ -32,5 +32,5 @@ class ModelTrainPipeline:
         )
         print(results_df)
         self.saver_loader.save_models(self.models)
-        self.models = self.saver_loader.load_models()
-        ModelTrainer.evaluate(self.models, self.X_test, self.y_test)
+        # self.models = self.saver_loader.load_models()
+        # ModelTrainer.evaluate(self.models, self.X_test, self.y_test)

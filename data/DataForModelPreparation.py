@@ -6,14 +6,8 @@ from sklearn.model_selection import train_test_split
 
 class DataPreparation:
     @staticmethod
-    @ArgsChecker(
-        (DataManager, DataManager, DataManager), pd.DataFrame
-    )  # 型チェックを追加
-    def create_full_data(
-        processed_data_manager, label_data_manager, feature_data_manager
-    ):
-        # 加工後の株価データを読み込む
-        processed_data = processed_data_manager.load_data()
+    @ArgsChecker((DataManager, DataManager), pd.DataFrame)  # 型チェックを追加
+    def create_full_data(label_data_manager, feature_data_manager):
 
         # ラベルデータを読み込み、label列のみを付加する
         label_data = label_data_manager.load_data()[["date", "symbol", "label"]]
@@ -22,8 +16,8 @@ class DataPreparation:
         feature_data = feature_data_manager.load_data()
 
         # データを結合する
-        full_data = processed_data.merge(label_data, on=["date", "symbol"], how="left")
-        full_data = full_data.merge(feature_data, on=["date", "symbol"], how="left")
+        full_data = feature_data.merge(label_data, on=["date", "symbol"], how="left")
+        # full_data = full_data.merge(feature_data, on=["date", "symbol"], how="left")
 
         return full_data
 

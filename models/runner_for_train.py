@@ -19,7 +19,6 @@ def runner():
     # データ保存ディレクトリのベースパスと拡張子を指定
     symbol = "7203"
     base_data_path = "data/stock_data"
-    model_base_path = "models"
     file_ext = "parquet"  # CSVの代わりにparquetを使用
     end_date = pd.Timestamp("today").strftime("%Y-%m-%d")
 
@@ -42,23 +41,18 @@ def runner():
     training_and_test_data_path = generate_path(
         base_data_path, "training_and_test", symbol, end_date, file_ext
     )
-    # モデルの保存パスを生成
-    save_paths = [
-        generate_path(model_base_path, "trained_models", model_type, end_date, "pkl")
-        for model_type in model_types
-    ]
-
     # データマネージャのインスタンスを作成
     training_and_test_data_manager = DataManager(training_and_test_data_path)
 
-    # モデルの作成とトレーニング
+    # モデルのインスタンス作成
     models = ModelFactory.create_models(model_types)
-
-    # モデルセーブローダーのインスタンス作成
-    saver_loader = ModelSaverLoader(save_paths)
+    model_save_path = "models/trained_models"
+    model_file_ext = "pkl"
+    # モデルセーブローダーのインスタンスを作成
+    model_saver_loader = ModelSaverLoader(model_save_path, model_file_ext)
 
     # モデルパイプラインの作成と実行
-    ModelTrainPipeline(training_and_test_data_manager, models, saver_loader).run()
+    ModelTrainPipeline(training_and_test_data_manager, models, model_saver_loader).run()
 
 
 if __name__ == "__main__":

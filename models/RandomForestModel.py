@@ -27,8 +27,10 @@ class RandomForestModel(BaseModelABC):
         return self, result
 
     @ArgsChecker((None, pd.DataFrame), pd.Series)
-    def predict(self, X_test: pd.DataFrame) -> Any:
-        return self.model.predict(X_test)
+    def predict(self, X_test: pd.DataFrame) -> pd.Series:
+        predictions = self.model.predict(X_test)
+        binary_predictions = (predictions >= 0.5).astype(int)
+        return pd.Series(binary_predictions)
 
     # @ArgsChecker((None, pd.DataFrame, pd.Series), Tuple[float, float, float, float])
     def evaluate(

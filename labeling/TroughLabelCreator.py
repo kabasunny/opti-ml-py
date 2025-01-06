@@ -52,4 +52,14 @@ class TroughLabelCreator(LabelCreatorABC):
         for trough_date in selected_troughs:
             df.loc[df["date"] == trough_date, "label"] = 1
 
+        # 指定された列を削除
+        columns_to_drop = [
+            "open",
+            "high",
+            "low",
+            "close",
+            "volume",
+        ]
+        df.drop(columns=columns_to_drop, inplace=True)
+
         return df
