@@ -105,3 +105,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+.data/stock_data/
+.models/trained_models/
