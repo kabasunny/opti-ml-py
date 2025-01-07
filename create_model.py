@@ -16,15 +16,7 @@ from models.ModelFactory import ModelFactory
 from models.ModelPredictPipeline import ModelPredictPipeline
 
 
-def main():
-
-    # 学習シミュレーション条件
-    symbol = "7203"
-    trade_start_date = pd.Timestamp("2003-08-01")
-    before_period_days = 366 * 2  # スタート日より、さかのぼって2年間のデータを取得
-    data_start_period = trade_start_date - pd.DateOffset(days=before_period_days)
-    end_date = pd.Timestamp("today").strftime("%Y-%m-%d")
-
+def create_model(symbol, trade_start_date, data_start_period, end_date, model_types):
     # ----------------------data----------------------
     # データ保存ディレクトリのベースパスと拡張子を指定
     base_data_path = "data/stock_data"
@@ -56,17 +48,6 @@ def main():
     pred_d_m = DataManager(predictions_save_path)
 
     # ----------------------model----------------------
-    # 学習用モデル
-    model_types = [
-        "LightGBM",
-        "RandomForest",
-        "XGBoost",
-        "CatBoost",
-        "AdaBoost",
-        "SVM",
-        "KNeighbors",
-        "LogisticRegression",
-    ]
     models = ModelFactory.create_models(model_types)
     model_save_path = "models/trained_models"
     model_file_ext = "pkl"
@@ -115,4 +96,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    create_model()

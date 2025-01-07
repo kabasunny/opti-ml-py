@@ -10,17 +10,27 @@ from selectores.SelectorPipeline import SelectorPipeline
 from data.DataForModelPipeline import DataForModelPipeline
 from features.AnalyzerFactory import AnalyzerFactory
 from selectores.SelectorFactory import SelectorFactory
+from models.ModelTrainPipeline import ModelTrainPipeline
 from models.ModelSaverLoader import ModelSaverLoader
-from models.ModelRetrainPipeline import ModelRetrainPipeline
+from models.ModelFactory import ModelFactory
 from models.ModelPredictPipeline import ModelPredictPipeline
 
 
-# 再トレーニング用のmain関数を定義
-def retrain_model(symbol, trade_start_date, data_start_period, end_date, model_types):
-    # ----------------------data----------------------
-    base_data_path = "data/stock_data"
-    file_ext = "parquet"
+def create_model():
 
+    # 学習シミュレーション条件
+    symbol = "7203"
+    trade_start_date = pd.Timestamp("2003-08-01")
+    before_period_days = 366 * 2  # スタート日より、さかのぼって2年間のデータを取得
+    data_start_period = trade_start_date - pd.DateOffset(days=before_period_days)
+    end_date = pd.Timestamp("today").strftime("%Y-%m-%d")
+
+    # ----------------------data----------------------
+    # データ保存ディレクトリのベースパスと拡張子を指定
+    base_data_path = "data/stock_data"
+    file_ext = "parquet"  # CSVの代わりにparquetを使用 Goで使用可能
+
+    # 各パイプラインのデータ保存パス作成
     def generate_path(data_name):
         return f"{base_data_path}/{data_name}/{symbol}_{end_date}.{file_ext}"
 
@@ -46,8 +56,21 @@ def retrain_model(symbol, trade_start_date, data_start_period, end_date, model_t
     pred_d_m = DataManager(predictions_save_path)
 
     # ----------------------model----------------------
+    # 学習用モデル
+    model_types = [
+        "LightGBM",
+        "RandomForest",
+        "XGBoost",
+        "CatBoost",
+        "AdaBoost",
+        "SVM",
+        "KNeighbors",
+        "LogisticRegression",
+    ]
+    models = ModelFactory.create_models(model_types)
     model_save_path = "models/trained_models"
     model_file_ext = "pkl"
+    # モデルセーブローダーのインスタンスを作成
     model_saver_loader = ModelSaverLoader(model_save_path, model_file_ext)
 
     # ----------------------pipeline----------------------
@@ -60,7 +83,7 @@ def retrain_model(symbol, trade_start_date, data_start_period, end_date, model_t
     label_creator = TroughLabelCreator(trade_start_date)
     LabelCreationPipeline(raw_data_manager, l_d_m, label_creator).run()
     # print("★ FeatureCreationPipeline ★")
-    feature_list_str = ["peak_trough", "fourier", "volume", "price"]
+    feature_list_str = ["peak_trough", "fourier", "volume", "price"]  # 特徴量リスト
     analyzers = AnalyzerFactory.create_analyzers(feature_list_str)
     FeaturePipeline(
         prsd_d_m,
@@ -80,8 +103,8 @@ def retrain_model(symbol, trade_start_date, data_start_period, end_date, model_t
         tr_tt_d_m,
         prct_d_m,
     ).run()
-    # print("★ ModelRetrainPipeline ★")
-    ModelRetrainPipeline(tr_tt_d_m, model_saver_loader, model_types).run()
+    # print("★ ModelTrainPipeline ★")
+    ModelTrainPipeline(tr_tt_d_m, models, model_saver_loader).run()
     # print("★ ModelPredictPipeline ★")
     ModelPredictPipeline(
         model_saver_loader,
@@ -92,4 +115,4 @@ def retrain_model(symbol, trade_start_date, data_start_period, end_date, model_t
 
 
 if __name__ == "__main__":
-    retrain_model()
+    create_model()
