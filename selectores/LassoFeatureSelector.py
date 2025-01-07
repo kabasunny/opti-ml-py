@@ -31,7 +31,6 @@ class LassoFeatureSelector(SupervisedFeatureSelectorABC):
         """
         features = df.drop(columns=[target_column])  # ターゲット列を除外
         target = df[target_column]
-
         # Lasso回帰を適用
         self.lasso.fit(features, target)
         selected_features = features.columns[self.lasso.coef_ != 0]

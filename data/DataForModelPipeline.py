@@ -31,7 +31,7 @@ class DataForModelPipeline:
 
     @ArgsChecker((), None)
     def run(self):
-        print("Run Data For Model Pipeline")
+        # print("Run Data For Model Pipeline")
 
         # ラベル付きのデータを作成する
         full_data = DataPreparation.create_full_data(

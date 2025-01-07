@@ -32,7 +32,7 @@ class FeaturePipeline:
         Returns:
             pd.DataFrame: 選択された特徴量のみを含むデータフレーム
         """
-        print("Run Feature creation pipeline")
+        # print("Run Feature creation pipeline")
         # データをロード
         df = self.processed_data_manager.load_data()
 

@@ -26,7 +26,7 @@ class SelectorPipeline:
         Returns:
             pd.DataFrame: 最終的に選択された特徴量のみを含むデータフレーム
         """
-        print("Run Selector pipeline")
+        # print("Run Selector pipeline")
         # 正規化済みデータをロード
         df_normalized = self.normalized_f_d_manager.load_data()
 

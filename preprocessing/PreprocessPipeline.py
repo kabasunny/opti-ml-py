@@ -19,7 +19,7 @@ class PreprocessPipeline:
     @ArgsChecker((None,), None)
     def run(self):
         """データパイプラインの実行"""
-        print("Run Preprocess pipeline")
+        # print("Run Preprocess pipeline")
         # データの読み込み
         df = self.raw_data_manager.load_data()
         # print("Raw data loaded successfully")

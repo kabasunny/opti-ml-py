@@ -33,3 +33,5 @@ class ModelRetrainPipeline:
         )
         print(results_df)
         self.saver_loader.save_models(self.models)
+
+        print("Model Re Train Pipeline completed successfully")

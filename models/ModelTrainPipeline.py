@@ -47,3 +47,5 @@ class ModelTrainPipeline:
         self.saver_loader.save_models(self.models)
         # self.models = self.saver_loader.load_models()
         # ModelTrainer.evaluate(self.models, self.X_test, self.y_test)
+
+        print("Model Train Pipeline completed successfully")

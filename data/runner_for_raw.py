@@ -22,7 +22,7 @@ def toggle(flag):
 
 if __name__ == "__main__":
     symbol = "7203"
-    trade_start_date = pd.Timestamp("2023-08-01")
+    trade_start_date = pd.Timestamp("2003-08-01")
     before_period_days = 366 * 1
     data_period = trade_start_date - pd.DateOffset(days=before_period_days)
     end_date = pd.Timestamp("today")
@@ -32,15 +32,15 @@ if __name__ == "__main__":
         raw_data_path
     )  # RawDataManager クラスのインスタンスを作成
 
-    use_jquants = True  # 初期値をTrueに設定
-    max_iterations = 2  # 最大ループ回数を設定
+    use_jquants = False  # 初期値をTrueに設定
+    max_iterations = 1  # 最大ループ回数を設定
     for _ in range(max_iterations):  # ここでは2回交互に実行します
         if use_jquants:
             print("\n★JQuantsStockDataFetcher★")
-            fetcher = JQuantsStockDataFetcher("7203", "2023-01-01", "2023-12-31")
+            fetcher = JQuantsStockDataFetcher("1570", "2023-01-01", "2023-12-31")
         else:
             print("\n★YahooFinanceStockDataFetcher★")
-            fetcher = YahooFinanceStockDataFetcher("7203", "2023-01-01", "2023-12-31")
+            fetcher = YahooFinanceStockDataFetcher("1570", "2023-01-01", "2023-12-31")
 
         # DataPipeline クラスのインスタンスを作成し、データパイプラインを実行
         pipeline = RawDataPipeline(fetcher, data_manager)

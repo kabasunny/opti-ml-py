@@ -55,15 +55,15 @@ def create_model(symbol, trade_start_date, data_start_period, end_date, model_ty
     model_saver_loader = ModelSaverLoader(model_save_path, model_file_ext)
 
     # ----------------------pipeline----------------------
-    print("★ DataPipeline ★")
+    # print("★ DataPipeline ★")
     fetcher = YahooFinanceStockDataFetcher(symbol, data_start_period, end_date)
     RawDataPipeline(fetcher, raw_data_manager).run()
-    print("★ PreprocessPipeline ★")
+    # print("★ PreprocessPipeline ★")
     PreprocessPipeline(raw_data_manager, prsd_d_m).run()
-    print("★ LabelCreationPipeline ★")
+    # print("★ LabelCreationPipeline ★")
     label_creator = TroughLabelCreator(trade_start_date)
     LabelCreationPipeline(raw_data_manager, l_d_m, label_creator).run()
-    print("★ FeatureCreationPipeline ★")
+    # print("★ FeatureCreationPipeline ★")
     feature_list_str = ["peak_trough", "fourier", "volume", "price"]  # 特徴量リスト
     analyzers = AnalyzerFactory.create_analyzers(feature_list_str)
     FeaturePipeline(
@@ -73,10 +73,10 @@ def create_model(symbol, trade_start_date, data_start_period, end_date, model_ty
         analyzers,
         trade_start_date,
     ).run()
-    print("★ FeatureSelectionPipeline ★")
+    # print("★ FeatureSelectionPipeline ★")
     selectors = SelectorFactory.create_selectors()
     SelectorPipeline(l_d_m, n_f_d_m, s_f_d_m, selectors).run()
-    print("★ DataForModelPipeline ★")
+    # print("★ DataForModelPipeline ★")
     DataForModelPipeline(
         l_d_m,
         f_d_m,
@@ -84,9 +84,9 @@ def create_model(symbol, trade_start_date, data_start_period, end_date, model_ty
         tr_tt_d_m,
         prct_d_m,
     ).run()
-    print("★ ModelTrainPipeline ★")
+    # print("★ ModelTrainPipeline ★")
     ModelTrainPipeline(tr_tt_d_m, models, model_saver_loader).run()
-    print("★ ModelPredictPipeline ★")
+    # print("★ ModelPredictPipeline ★")
     ModelPredictPipeline(
         model_saver_loader,
         prct_d_m,

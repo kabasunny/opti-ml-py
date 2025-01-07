@@ -9,8 +9,7 @@ if project_root not in sys.path:
     sys.path.append(project_root)
 
 from LabelCreationPipeline import LabelCreationPipeline
-from data.RawDataManager import DataManager
-from data.LabelDataManager import LabelDataManager
+from data.DataManager import DataManager
 from labeling.TroughLabelCreator import TroughLabelCreator
 
 if __name__ == "__main__":
@@ -19,9 +18,9 @@ if __name__ == "__main__":
 
     # RawDataManager と LabelDataManager のインスタンスを作成
     raw_data_manager = DataManager(raw_data_path)
-    label_data_manager = LabelDataManager(label_data_path)
+    label_data_manager = DataManager(label_data_path)
 
-    trade_start_date = pd.Timestamp("2023-08-01")  # ここで trade_start_date を定義
+    trade_start_date = pd.Timestamp("2003-08-01")  # ここで trade_start_date を定義
     label_creator = TroughLabelCreator(
         trade_start_date
     )  # トラフラベルクリエータークラス
