@@ -22,34 +22,32 @@ def main():
         "LogisticRegression",
     ]
 
-    first_symbol = True  # 初回かどうかのフラグ
+    model_created = False  # モデルが作成されたかどうかのフラグ
 
     while symbols:
         symbol = symbols.pop(0)
 
         try:
-            if first_symbol:
+            if not model_created:
                 create_model(
                     symbol, trade_start_date, data_start_period, end_date, model_types
                 )
-                first_symbol = False
+                model_created = True
             else:
                 retrain_model(
                     symbol, trade_start_date, data_start_period, end_date, model_types
                 )
         except Exception as e:
-            print(f"{symbol} の処理中にエラーが発生しました: {e}")
+            print(f"{symbol} の処理中にエラーが発生しました")
             if check_data_availability(
                 symbol, trade_start_date, before_period_days, end_date
             ):
-                # 次の銘柄でcreate_modelを再度実行
-                if first_symbol:
-                    continue
-                else:
-                    first_symbol = True
-                    symbols.insert(0, symbol)  # シンボルを戻して再試行
+                # データ不足のため、スキップします
+                print(f"データ不足のため、スキップします")
+                continue
             else:
-                print(f"{symbol} のデータが不足しています。スキップします。")
+                print(f"{e} \n処理を修了します")
+                break
 
 
 def check_data_availability(symbol, trade_start_date, before_period_days, end_date):
@@ -65,7 +63,7 @@ def check_data_availability(symbol, trade_start_date, before_period_days, end_da
     oldest_date = df.index.min()
     oldest_date = pd.to_datetime(oldest_date)  # Timestamp型に変換
     required_date = trade_start_date - pd.DateOffset(
-        days=(before_period_days + extra_days)
+        days=(before_period_days - extra_days)
     )
 
     # 最古の日付が、required_dateよりも新しい場合

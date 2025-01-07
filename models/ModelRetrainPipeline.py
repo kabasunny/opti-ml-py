@@ -1,6 +1,5 @@
 from models.ModelTrainer import ModelTrainer
 from models.ModelSaverLoader import ModelSaverLoader
-from models.BaseModelABC import BaseModelABC
 from data.DataExtractor import DataExtractor
 from data.DataManager import DataManager
 from typing import List
