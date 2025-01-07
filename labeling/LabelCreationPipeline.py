@@ -24,6 +24,8 @@ class LabelCreationPipeline:
         labels = self.label_creator.create_labels(df)
         # print("Labels created")
 
+        # print(f"labels{len(labels)}")
+
         # ラベルデータの保存
         self.label_data_manager.save_data(labels)
         # print("Labels saved successfully")

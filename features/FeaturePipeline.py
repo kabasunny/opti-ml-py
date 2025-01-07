@@ -89,6 +89,7 @@ class FeaturePipeline:
         # print("Data with df_normalized:")
         # print(df_normalized.head())
         # print(df_normalized.info())
+        # print(f"df_normalized{len(df_normalized)}")
 
         self.normalized_f_d_manager.save_data(df_normalized)
 

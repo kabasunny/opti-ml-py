@@ -15,7 +15,7 @@ class LightGBMModel(BaseModelABC):
             "learning_rate": 0.01,
             "num_leaves": 31,
             "max_depth": -1,
-            "min_data_in_leaf": 10,
+            "min_data_in_leaf": 20,
             "feature_fraction": 0.8,
             "bagging_fraction": 0.8,
             "bagging_freq": 10,
@@ -48,7 +48,7 @@ class LightGBMModel(BaseModelABC):
     @ArgsChecker((None, pd.DataFrame), pd.Series)
     def predict(self, X_test: pd.DataFrame) -> pd.Series:
         predictions = self.model.predict(X_test)
-        binary_predictions = (predictions >= 0.5).astype(int)
+        binary_predictions = (predictions >= 0.53).astype(int)
         return pd.Series(binary_predictions)
 
     def evaluate(

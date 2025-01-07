@@ -37,17 +37,26 @@ class DataPreparation:
     )
     def split_data_for_modeling(correct_data, incorrect_data):
         # コレクトデータをランダムに二つに分割
-        correct_data_train_eval = correct_data.sample(frac=0.8, random_state=42)
+        correct_data_train_eval = correct_data.sample(frac=0.5, random_state=42)
         correct_data_practical_test = correct_data.drop(correct_data_train_eval.index)
 
         # 不正解データをランダムに分割
+        # CASE1:正解と同じ数
         incorrect_data_train_eval = incorrect_data.sample(
             n=correct_data_train_eval.shape[0], random_state=42
         )
+        # CASE2:全数の半分の数
+        # incorrect_data_train_eval = incorrect_data.sample(frac=0.5, random_state=42)
+
         incorrect_data_practical_test = incorrect_data.drop(
             incorrect_data_train_eval.index
         )
-
+        # print(
+        #     len(correct_data_train_eval),
+        #     len(correct_data_practical_test),
+        #     len(incorrect_data_train_eval),
+        #     len(incorrect_data_practical_test),
+        # )
         return (
             correct_data_train_eval,
             correct_data_practical_test,

@@ -53,7 +53,6 @@ class SelectorPipeline:
 
         # 不要なカラムをドロップ
         columns_to_drop = [
-            "Unnamed: 0",
             "symbol",
             "open",
             "high",

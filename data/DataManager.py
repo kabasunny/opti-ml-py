@@ -13,7 +13,7 @@ class DataManager:
         """ラベルデータを保存するメソッド"""
         try:
             os.makedirs(os.path.dirname(self.path), exist_ok=True)
-            df.to_csv(self.path, index=True)
+            df.to_parquet(self.path, index=True)
             # print(f"データが {self.path} に保存されました")
         except Exception as e:
             print(f"{self.path}のデータ保存に失敗しました: {e}")
@@ -22,7 +22,7 @@ class DataManager:
     def load_data(self) -> pd.DataFrame:
         """ラベルデータをロードするメソッド"""
         try:
-            df = pd.read_csv(self.path, index_col=0)
+            df = pd.read_parquet(self.path)
             # print(f"データが {self.path} からロードされました")
             return df
         except Exception as e:

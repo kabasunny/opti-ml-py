@@ -20,17 +20,24 @@ class ModelSaverLoader:
 
     def load_models(self, model_types: List[str]) -> List[object]:
         models = []
-        print(f"Loading models from {self.model_base_path}")
         for model_type in model_types:
             for filename in os.listdir(self.model_base_path):
                 if model_type in filename and filename.endswith(self.model_file_ext):
                     filepath = os.path.join(self.model_base_path, filename)
-                    # print(f"Trying to load model from {filepath}")
                     with open(filepath, "rb") as file:
                         model = pickle.load(file)
                         models.append(model)
-                        # print(f"Loaded model {model_type}")
-                        break
+                    break
             else:
-                print(f"Model file for {model_type} does not exist")
+                print(f"{model_type}のモデルファイルが存在しません。")
         return models
+
+    def check_existing_models(self, models: List[object]) -> bool:
+        """保存済みモデルが存在するかチェック"""
+        for model in models:
+            model_name = model.__class__.__name__.replace("Model", "")
+            today_date = datetime.today().strftime("%Y%m%d")
+            filepath = f"{self.model_base_path}/{model_name}_{today_date}.{self.model_file_ext}"
+            if os.path.exists(filepath):
+                return True
+        return False

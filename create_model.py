@@ -20,7 +20,7 @@ def main():
 
     # 学習シミュレーション条件
     symbol = "7203"
-    trade_start_date = pd.Timestamp("2023-08-01")
+    trade_start_date = pd.Timestamp("2003-08-01")
     before_period_days = 366 * 2  # スタート日より、さかのぼって2年間のデータを取得
     data_start_period = trade_start_date - pd.DateOffset(days=before_period_days)
     end_date = pd.Timestamp("today").strftime("%Y-%m-%d")
@@ -52,7 +52,7 @@ def main():
     n_f_d_m = DataManager(normalized_f_d_path)
     s_f_d_m = DataManager(selected_f_d_path)
     tr_tt_d_m = DataManager(training_test_d_p)
-    prcl_d_m = DataManager(practical_d_p)
+    prct_d_m = DataManager(practical_d_p)
     pred_d_m = DataManager(predictions_save_path)
 
     # ----------------------model----------------------
@@ -101,14 +101,14 @@ def main():
         f_d_m,
         s_f_d_m,
         tr_tt_d_m,
-        prcl_d_m,
+        prct_d_m,
     ).run()
     print("★ ModelTrainPipeline ★")
     ModelTrainPipeline(tr_tt_d_m, models, model_saver_loader).run()
     print("★ ModelPredictPipeline ★")
     ModelPredictPipeline(
         model_saver_loader,
-        prcl_d_m,
+        prct_d_m,
         pred_d_m,
         model_types,
     ).run()

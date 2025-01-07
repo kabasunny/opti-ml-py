@@ -52,6 +52,7 @@ class DataForModelPipeline:
         combined_data = DataPreparation.prepare_training_and_test_data(
             correct_data_train_eval, incorrect_data_train_eval
         )
+        # print(f"combined_data{len(combined_data)}")
 
         # 訓練データとテストデータを保存
         self.training_and_test_data_manager.save_data(combined_data)
@@ -60,7 +61,7 @@ class DataForModelPipeline:
         practical_data = DataPreparation.prepare_practical_data(
             correct_data_practical_test, incorrect_data_practical_test
         )
-
+        # print(f"practical_data{len(practical_data)}")
         # 実践テストデータを保存
         self.practical_data_manager.save_data(practical_data)
 
