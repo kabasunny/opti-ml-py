@@ -8,12 +8,12 @@ class SelectorPipeline:
     @ArgsChecker((None, DataManager, DataManager, DataManager, list), None)
     def __init__(
         self,
-        target_data_manager: DataManager,
+        label_data_manager: DataManager,
         normalized_f_d_manager: DataManager,
         selected_f_d_manager: DataManager,
         selectors: list,
     ):
-        self.target_data_manager = target_data_manager
+        self.target_data_manager = label_data_manager
         self.normalized_f_d_manager = normalized_f_d_manager
         self.selected_f_d_manager = selected_f_d_manager
         self.selectors = selectors

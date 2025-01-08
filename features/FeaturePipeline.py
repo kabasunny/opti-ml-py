@@ -6,20 +6,16 @@ from data.DataManager import DataManager
 
 
 class FeaturePipeline:
-    @ArgsChecker(
-        (None, DataManager, DataManager, DataManager, list, pd.Timestamp), None
-    )
+    @ArgsChecker((None, DataManager, DataManager, list, pd.Timestamp), None)
     def __init__(
         self,
         processed_data_manager: DataManager,
-        feature_data_manager: DataManager,
         normalized_f_d_manager: DataManager,
         analyzers: list,
         trade_start_date: pd.Timestamp,
     ):
         self.normalizer = Normalizer()  # Normalizerクラスのインスタンスを作成
         self.processed_data_manager = processed_data_manager
-        self.feature_data_manager = feature_data_manager
         self.normalized_f_d_manager = normalized_f_d_manager
         self.analyzers = analyzers
         self.trade_start_date = trade_start_date
@@ -42,10 +38,6 @@ class FeaturePipeline:
 
         for analyzer in self.analyzers:
             df = analyzer.create_features(df, self.trade_start_date)
-            # print(f"Data with features: {analyzer}")
-            # print(df.head())
-            # print(df.tail())
-            # print(df.info())
 
         # trade_start_date 以降の日付のデータをフィルタリング
         df_with_features = df[df["date"] >= self.trade_start_date].copy()
@@ -59,12 +51,6 @@ class FeaturePipeline:
             "volume",
         ]
         df_with_features.drop(columns=columns_to_drop, inplace=True)
-
-        # print("Data with features:")
-        # print(df_with_features.head())
-        # print(df_with_features.info())
-
-        self.feature_data_manager.save_data(df_with_features)
 
         # 正規化する列を指定
         columns_to_normalize = [
@@ -86,10 +72,6 @@ class FeaturePipeline:
         df_normalized = self.normalizer.normalize(
             df_with_features, columns_to_normalize
         )
-        # print("Data with df_normalized:")
-        # print(df_normalized.head())
-        # print(df_normalized.info())
-        # print(f"df_normalized{len(df_normalized)}")
 
         self.normalized_f_d_manager.save_data(df_normalized)
 

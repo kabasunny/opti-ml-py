@@ -11,20 +11,17 @@ class DataForModelPipeline:
             DataManager,
             DataManager,
             DataManager,
-            DataManager,
         ),
         None,
     )
     def __init__(
         self,
         label_data_manager,
-        feature_data_manager,
         selected_feature_manager,
         training_and_test_data_manager,
         practical_data_manager,
     ):
         self.label_data_manager = label_data_manager
-        self.feature_data_manager = feature_data_manager
         self.selected_feature_manager = selected_feature_manager
         self.training_and_test_data_manager = training_and_test_data_manager
         self.practical_data_manager = practical_data_manager
@@ -36,7 +33,7 @@ class DataForModelPipeline:
         # ラベル付きのデータを作成する
         full_data = DataPreparation.create_full_data(
             self.label_data_manager,
-            self.feature_data_manager,
+            self.selected_feature_manager,
         )
         correct_data, incorrect_data = DataPreparation.split_data_by_label(full_data)
 
@@ -50,7 +47,8 @@ class DataForModelPipeline:
 
         # 訓練データとテストデータを準備
         combined_data = DataPreparation.prepare_training_and_test_data(
-            correct_data_train_eval, incorrect_data_train_eval
+            correct_data_train_eval,
+            incorrect_data_train_eval,
         )
         # print(f"combined_data{len(combined_data)}")
 

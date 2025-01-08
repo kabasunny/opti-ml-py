@@ -15,13 +15,13 @@ class ModelPredictor:
 
     @staticmethod
     def evaluate(
-        models: List[BaseModelABC], X_test: pd.DataFrame, y_test: pd.Series
+        models: List[BaseModelABC], feature: pd.DataFrame, label: pd.Series
     ) -> pd.DataFrame:
         evaluations = []
         model_names = []
         for model in models:
             model_name = type(model).__name__.replace("Model", "")
-            evaluations.append(model.evaluate(X_test, y_test))
+            evaluations.append(model.evaluate(feature, label))
             model_names.append(model_name)
         evaluations_df = pd.DataFrame(
             evaluations,

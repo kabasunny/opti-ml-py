@@ -8,7 +8,7 @@ project_root = os.path.abspath(os.path.join(current_dir, ".."))
 if project_root not in sys.path:
     sys.path.append(project_root)
 
-from LabelCreationPipeline import LabelCreationPipeline
+from labeling.LabelCreatePipeline import LabelCreatePipeline
 from data.DataManager import DataManager
 from labeling.TroughLabelCreator import TroughLabelCreator
 
@@ -26,7 +26,5 @@ if __name__ == "__main__":
     )  # トラフラベルクリエータークラス
 
     # LabelCreationPipeline のインスタンスを作成し、実行
-    pipeline = LabelCreationPipeline(
-        raw_data_manager, label_data_manager, label_creator
-    )
+    pipeline = LabelCreatePipeline(raw_data_manager, label_data_manager, label_creator)
     pipeline.run()

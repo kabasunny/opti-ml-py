@@ -3,7 +3,7 @@ from data.YahooFinanceStockDataFetcher import YahooFinanceStockDataFetcher
 from data.DataManager import DataManager
 from data.RawDataPipeline import RawDataPipeline
 from preprocessing.PreprocessPipeline import PreprocessPipeline
-from labeling.LabelCreationPipeline import LabelCreationPipeline
+from labeling.LabelCreatePipeline import LabelCreatePipeline
 from labeling.TroughLabelCreator import TroughLabelCreator
 from features.FeaturePipeline import FeaturePipeline
 from selectores.SelectorPipeline import SelectorPipeline
@@ -35,9 +35,8 @@ def retrain_model():
     raw_data_path = generate_path("formated_raw")
     processed_data_path = generate_path("processed_raw")
     label_data_path = generate_path("labeled")
-    feature_data_path = generate_path("feature")
-    normalized_f_d_path = generate_path("normalized_ft")
-    selected_f_d_path = generate_path("selected_ft")
+    normalized_f_d_path = generate_path("normalized_feature")
+    selected_f_d_path = generate_path("selected_feature")
     training_test_d_p = generate_path("training_and_test")
     practical_d_p = generate_path("practical")
     predictions_save_path = generate_path("predictions")
@@ -46,7 +45,6 @@ def retrain_model():
     raw_data_manager = DataManager(raw_data_path)
     prsd_d_m = DataManager(processed_data_path)
     l_d_m = DataManager(label_data_path)
-    f_d_m = DataManager(feature_data_path)
     n_f_d_m = DataManager(normalized_f_d_path)
     s_f_d_m = DataManager(selected_f_d_path)
     tr_tt_d_m = DataManager(training_test_d_p)
@@ -69,40 +67,39 @@ def retrain_model():
     model_saver_loader = ModelSaverLoader(model_save_path, model_file_ext)
 
     # ----------------------pipeline----------------------
-    print("★ DataPipeline ★")
+    # print("★ DataPipeline ★")
     fetcher = YahooFinanceStockDataFetcher(symbol, data_start_period, end_date)
     RawDataPipeline(fetcher, raw_data_manager).run()
-    print("★ PreprocessPipeline ★")
+    # print("★ PreprocessPipeline ★")
     PreprocessPipeline(raw_data_manager, prsd_d_m).run()
-    print("★ LabelCreationPipeline ★")
+    # print("★ LabelCreationPipeline ★")
     label_creator = TroughLabelCreator(trade_start_date)
-    LabelCreationPipeline(raw_data_manager, l_d_m, label_creator).run()
-    print("★ FeatureCreationPipeline ★")
+    LabelCreatePipeline(raw_data_manager, l_d_m, label_creator).run()
+    # print("★ FeatureCreationPipeline ★")
     feature_list_str = ["peak_trough", "fourier", "volume", "price"]
     analyzers = AnalyzerFactory.create_analyzers(feature_list_str)
     FeaturePipeline(
         prsd_d_m,
-        f_d_m,
         n_f_d_m,
         analyzers,
         trade_start_date,
     ).run()
-    print("★ FeatureSelectionPipeline ★")
+    # print("★ FeatureSelectionPipeline ★")
     selectors = SelectorFactory.create_selectors()
     SelectorPipeline(l_d_m, n_f_d_m, s_f_d_m, selectors).run()
-    print("★ DataForModelPipeline ★")
+    # print("★ DataForModelPipeline ★")
     DataForModelPipeline(
         l_d_m,
-        f_d_m,
         s_f_d_m,
         tr_tt_d_m,
         prct_d_m,
     ).run()
-    print("★ ModelRetrainPipeline ★")
+    # print("★ ModelRetrainPipeline ★")
     ModelRetrainPipeline(tr_tt_d_m, model_saver_loader, model_types).run()
-    print("★ ModelPredictPipeline ★")
+    # print("★ ModelPredictPipeline ★")
     ModelPredictPipeline(
         model_saver_loader,
+        tr_tt_d_m,
         prct_d_m,
         pred_d_m,
         model_types,

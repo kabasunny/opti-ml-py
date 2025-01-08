@@ -36,12 +36,10 @@ class ModelTrainPipeline:
         # モデルの保存前に確認
         if self.saver_loader.check_existing_models(self.models):
             confirm = (
-                input("モデルが既に存在します。上書きしてよいですか？ (Y/N): ")
-                .strip()
-                .upper()
+                input("現在のモデルを上書きしてよいですか? (Y/N): ").strip().upper()
             )
             if confirm != "Y":
-                print("モデルの保存をキャンセルしました。")
+                print("モデルの上書きをパスしました")
                 return
 
         self.saver_loader.save_models(self.models)

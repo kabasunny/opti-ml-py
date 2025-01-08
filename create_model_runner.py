@@ -3,7 +3,7 @@ from data.YahooFinanceStockDataFetcher import YahooFinanceStockDataFetcher
 from data.DataManager import DataManager
 from data.RawDataPipeline import RawDataPipeline
 from preprocessing.PreprocessPipeline import PreprocessPipeline
-from labeling.LabelCreationPipeline import LabelCreationPipeline
+from labeling.LabelCreatePipeline import LabelCreatePipeline
 from labeling.TroughLabelCreator import TroughLabelCreator
 from features.FeaturePipeline import FeaturePipeline
 from selectores.SelectorPipeline import SelectorPipeline
@@ -37,9 +37,8 @@ def create_model():
     raw_data_path = generate_path("formated_raw")
     processed_data_path = generate_path("processed_raw")
     label_data_path = generate_path("labeled")
-    feature_data_path = generate_path("feature")
-    normalized_f_d_path = generate_path("normalized_ft")
-    selected_f_d_path = generate_path("selected_ft")
+    normalized_f_d_path = generate_path("normalized_feature")
+    selected_f_d_path = generate_path("selected_feature")
     training_test_d_p = generate_path("training_and_test")
     practical_d_p = generate_path("practical")
     predictions_save_path = generate_path("predictions")
@@ -48,7 +47,6 @@ def create_model():
     raw_data_manager = DataManager(raw_data_path)
     prsd_d_m = DataManager(processed_data_path)
     l_d_m = DataManager(label_data_path)
-    f_d_m = DataManager(feature_data_path)
     n_f_d_m = DataManager(normalized_f_d_path)
     s_f_d_m = DataManager(selected_f_d_path)
     tr_tt_d_m = DataManager(training_test_d_p)
@@ -81,13 +79,13 @@ def create_model():
     PreprocessPipeline(raw_data_manager, prsd_d_m).run()
     # print("★ LabelCreationPipeline ★")
     label_creator = TroughLabelCreator(trade_start_date)
-    LabelCreationPipeline(raw_data_manager, l_d_m, label_creator).run()
+    LabelCreatePipeline(raw_data_manager, l_d_m, label_creator).run()
     # print("★ FeatureCreationPipeline ★")
     feature_list_str = ["peak_trough", "fourier", "volume", "price"]  # 特徴量リスト
     analyzers = AnalyzerFactory.create_analyzers(feature_list_str)
     FeaturePipeline(
         prsd_d_m,
-        f_d_m,
+        # f_d_m,
         n_f_d_m,
         analyzers,
         trade_start_date,
@@ -98,7 +96,6 @@ def create_model():
     # print("★ DataForModelPipeline ★")
     DataForModelPipeline(
         l_d_m,
-        f_d_m,
         s_f_d_m,
         tr_tt_d_m,
         prct_d_m,
@@ -108,6 +105,7 @@ def create_model():
     # print("★ ModelPredictPipeline ★")
     ModelPredictPipeline(
         model_saver_loader,
+        tr_tt_d_m,
         prct_d_m,
         pred_d_m,
         model_types,

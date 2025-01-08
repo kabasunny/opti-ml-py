@@ -51,12 +51,6 @@ class DataPreparation:
         incorrect_data_practical_test = incorrect_data.drop(
             incorrect_data_train_eval.index
         )
-        # print(
-        #     len(correct_data_train_eval),
-        #     len(correct_data_practical_test),
-        #     len(incorrect_data_train_eval),
-        #     len(incorrect_data_practical_test),
-        # )
         return (
             correct_data_train_eval,
             correct_data_practical_test,
@@ -115,3 +109,24 @@ class DataPreparation:
             [col for col in practical_data.columns if col != "label"] + ["label"]
         ]
         return practical_data
+
+    @staticmethod
+    @ArgsChecker((pd.DataFrame, pd.DataFrame), tuple)
+    def add_training_and_test_data(correct_data_train_eval, incorrect_data_train_eval):
+        # 訓練データとテストデータに分割
+        combined_train_eval_data = pd.concat(
+            [correct_data_train_eval, incorrect_data_train_eval]
+        )
+        # 特徴量とラベルに分ける
+        X = combined_train_eval_data.drop(columns=["label"])
+        y = combined_train_eval_data["label"]
+        # データを訓練データとテストデータに分割
+        X_train, X_test, y_train, y_test = train_test_split(
+            X,
+            y,
+            test_size=0.15,
+            shuffle=True,
+            random_state=42,
+        )
+
+        return X_train, X_test, y_train, y_test
