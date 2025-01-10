@@ -10,6 +10,7 @@ class PriceBasedTroughSelector:
     ) -> list:
         """
         選択された期間のトラフに基づいて、価格条件を満たすトラフを選択するメソッド
+        つまり、一定の利益がの出ないトラフを除外する
 
         Args:
             df (pd.DataFrame): 株価データフレーム

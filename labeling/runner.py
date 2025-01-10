@@ -13,8 +13,8 @@ from data.DataManager import DataManager
 from labeling.TroughLabelCreator import TroughLabelCreator
 
 if __name__ == "__main__":
-    raw_data_path = "data/raw/demo_row_stock_data.csv"
-    label_data_path = "data/label/demo_labels.csv"
+    raw_data_path = "data/stock_data/formated_raw/2501_2025-01-07.parquet"
+    label_data_path = "data/stock_data/labeled/2501_2025-01-08.parquet"
 
     # RawDataManager と LabelDataManager のインスタンスを作成
     raw_data_manager = DataManager(raw_data_path)

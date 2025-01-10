@@ -23,8 +23,8 @@ class LabelCreatePipeline:
         # ラベルの作成
         labels = self.label_creator.create_labels(df)
         # print("Labels created")
-
         # print(f"labels{len(labels)}")
+
 
         # ラベルデータの保存
         self.label_data_manager.save_data(labels)

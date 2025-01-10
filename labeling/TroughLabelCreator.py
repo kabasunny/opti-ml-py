@@ -14,7 +14,8 @@ class TroughLabelCreator(LabelCreatorABC):
     @ArgsChecker((None, pd.DataFrame), pd.DataFrame)
     def create_labels(self, df: pd.DataFrame) -> pd.DataFrame:
         """
-        日足の終値が週足トラフと同じ値であるものをラベル付けする関数
+        週足ベースで底値付近を正解
+        ピークから逆算し、ある程度の値幅がある場合に正解
         """
         # 日付列をTimestamp型に変換
         df["date"] = pd.to_datetime(df["date"])
@@ -40,10 +41,12 @@ class TroughLabelCreator(LabelCreatorABC):
             )
         )
 
+        # 一定の利益がの出ないトラフを除外する
         selected_price_troughs = PriceBasedTroughSelector.select_troughs_based_on_price(
             df, selected_period_troughs, high_x
         )
 
+        # ピークから逆算して、一定の利益が出るトラフを追加する
         selected_troughs = PeakBasedTroughSelector.select_troughs_based_on_peak(
             df, selected_price_troughs, troughs, peaks, pre_x, high_x
         )
@@ -51,6 +54,12 @@ class TroughLabelCreator(LabelCreatorABC):
         # ラベルを付ける
         for trough_date in selected_troughs:
             df.loc[df["date"] == trough_date, "label"] = 1
+
+            # 正解ラベルの日付の前日および翌日もラベルとして設定
+            for offset in range(-2, 3):  # 二日前から二日後まで
+                if offset != 0:
+                    adjusted_date = trough_date + pd.Timedelta(days=offset)
+                    df.loc[df["date"] == adjusted_date, "label"] = 1
 
         # 指定された列を削除
         columns_to_drop = [

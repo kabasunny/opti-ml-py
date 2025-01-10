@@ -15,7 +15,8 @@ class PeakBasedTroughSelector:
     ) -> list:
         """
         ピークの日付より pre_x 日前以内のトラフが、( peak - trough ) / trough > high_x のとき、
-        selected_price_troughs に追加するメソッド。ただし、重複させない。
+        selected_price_troughs に追加するメソッド。ただし、重複させない
+        つまり、ピークから逆算して、一定の利益が出るトラフを追加する
 
         Args:
             df (pd.DataFrame): 株価データフレーム
