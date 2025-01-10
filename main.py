@@ -6,7 +6,7 @@ from retrain_model import retrain_model
 def main():
     # シンボルの配列を用意
     symbols = [
-        "1570",  # 意図的にエラーを発生するシンボル
+        # "1570",  # 意図的にエラーを発生するシンボル
         "7203",  # Toyota Motor Corporation
         "7201",  # Honda Motor Co., Ltd.
         "7261",  # Mazda Motor Corporation

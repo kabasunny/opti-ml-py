@@ -3,6 +3,7 @@ from features.PeakTroughAnalyzer import PeakTroughAnalyzer
 from features.FourierAnalyzer import FourierAnalyzer
 from features.VolumeFeatureCreator import VolumeFeatureCreator
 from features.PriceFeatureCreator import PriceFeatureCreator
+from features.PastDataFeatureCreator import PastDataFeatureCreator
 
 
 class AnalyzerFactory:
@@ -13,6 +14,7 @@ class AnalyzerFactory:
             "fourier": FourierAnalyzer,
             "volume": VolumeFeatureCreator,
             "price": PriceFeatureCreator,
+            "past": PastDataFeatureCreator
         }
         return [
             analyzer_mapping[feature]()

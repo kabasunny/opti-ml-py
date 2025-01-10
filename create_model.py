@@ -62,7 +62,7 @@ def create_model(symbol, trade_start_date, data_start_period, end_date, model_ty
     label_creator = TroughLabelCreator(trade_start_date)
     LabelCreatePipeline(raw_data_manager, l_d_m, label_creator).run()
     # print("★ FeatureCreationPipeline ★")
-    feature_list_str = ["peak_trough", "fourier", "volume", "price"]  # 特徴量リスト
+    feature_list_str = ["peak_trough", "fourier", "volume", "price", "past"]  # 特徴量リスト
     analyzers = AnalyzerFactory.create_analyzers(feature_list_str)
     FeaturePipeline(
         prsd_d_m,

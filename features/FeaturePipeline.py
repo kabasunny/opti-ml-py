@@ -2,8 +2,7 @@ import pandas as pd
 from preprocessing.Normalizer import Normalizer  # Normalizerクラスをインポート
 from decorators.ArgsChecker import ArgsChecker  # デコレータクラスをインポート
 from data.DataManager import DataManager
-
-
+from features.PastDataFeatureCreator import PastDataFeatureCreator
 
 class FeaturePipeline:
     @ArgsChecker((None, DataManager, DataManager, list, pd.Timestamp), None)
@@ -80,7 +79,13 @@ class FeaturePipeline:
             "macd",
             "macd_signal",
             "macd_hist",
+
         ]
+
+        # 1個前から10個前の特徴量を正規化する列に追加
+        for i in range(1, 6):
+            columns_to_normalize.append(f"lag_{i}")
+            columns_to_normalize.append(f"lag_{i}_indicator")
 
         # 特徴量を正規化
         df_normalized = self.normalizer.normalize(
@@ -90,3 +95,21 @@ class FeaturePipeline:
         self.normalized_f_d_manager.save_data(df_normalized)
 
         print("Feature creation pipeline completed successfully")
+
+# 使用例
+if __name__ == "__main__":
+    # データマネージャの作成（例）
+    processed_data_manager = DataManager("path_to_processed_data")
+    normalized_f_d_manager = DataManager("path_to_normalized_data")
+
+    # 特徴量生成器のリストに PastDataFeatureCreator を追加
+    analyzers = [
+        PastDataFeatureCreator(),
+        # 他のアナライザもここに追加できます
+    ]
+
+    # FeaturePipeline の作成と実行
+    feature_pipeline = FeaturePipeline(
+        processed_data_manager, normalized_f_d_manager, analyzers, pd.Timestamp("2023-01-01")
+    )
+    feature_pipeline.run()

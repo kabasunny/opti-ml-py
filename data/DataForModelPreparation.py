@@ -42,11 +42,11 @@ class DataPreparation:
 
         # 不正解データをランダムに分割
         # CASE1:正解と同じ数
-        incorrect_data_train_eval = incorrect_data.sample(
-            n=correct_data_train_eval.shape[0], random_state=42
-        )
+        # incorrect_data_train_eval = incorrect_data.sample(
+        #     n=correct_data_train_eval.shape[0], random_state=42
+        # )
         # CASE2:全数の半分の数
-        # incorrect_data_train_eval = incorrect_data.sample(frac=0.5, random_state=42)
+        incorrect_data_train_eval = incorrect_data.sample(frac=0.5, random_state=42)
 
         incorrect_data_practical_test = incorrect_data.drop(
             incorrect_data_train_eval.index

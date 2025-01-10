@@ -76,7 +76,7 @@ def retrain_model():
     label_creator = TroughLabelCreator(trade_start_date)
     LabelCreatePipeline(raw_data_manager, l_d_m, label_creator).run()
     # print("★ FeatureCreationPipeline ★")
-    feature_list_str = ["peak_trough", "fourier", "volume", "price"]
+    feature_list_str = ["peak_trough", "fourier", "volume", "price", "past"]
     analyzers = AnalyzerFactory.create_analyzers(feature_list_str)
     FeaturePipeline(
         prsd_d_m,
