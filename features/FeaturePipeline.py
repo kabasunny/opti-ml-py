@@ -1,8 +1,8 @@
 import pandas as pd
-from selectores.CombinedFeatureSelector import CombinedFeatureSelector
 from preprocessing.Normalizer import Normalizer  # Normalizerクラスをインポート
 from decorators.ArgsChecker import ArgsChecker  # デコレータクラスをインポート
 from data.DataManager import DataManager
+
 
 
 class FeaturePipeline:
@@ -62,10 +62,24 @@ class FeaturePipeline:
             "ff4",
             "vsma10",
             "vsma30",
+            "vstd10",
+            "vstd30",
+            "vroc",
+            "v_bb_up",
+            "v_bb_low",
             "sma10",
             "sma30",
+            "sma90",
+            "sma180",
+            "sma360",
             "bb_up",
             "bb_low",
+            "rsi",
+            "momentum",
+            "adx",
+            "macd",
+            "macd_signal",
+            "macd_hist",
         ]
 
         # 特徴量を正規化

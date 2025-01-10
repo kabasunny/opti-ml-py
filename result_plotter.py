@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # データの読み込み
-stock_data_path = "data/stock_data/formated_raw/5803_2025-01-08.parquet"
-predictions_data_path = "data/stock_data/predictions/5803_2025-01-08.parquet"
+stock_data_path = "data/stock_data/formated_raw/7224_2025-01-10.parquet"
+predictions_data_path = "data/stock_data/predictions/7224_2025-01-10.parquet"
 
 stock_data = pd.read_parquet(stock_data_path)
 predictions_data = pd.read_parquet(predictions_data_path)
@@ -46,7 +46,7 @@ for model in models:
     )
 
     # プロットの装飾
-    plt.title(f"Stock Price and {model} Predictions")
+    plt.title(f"{model} Predictions on Stock Price")
     plt.xlabel("Date")
     plt.ylabel("Stock Price")
     plt.legend()

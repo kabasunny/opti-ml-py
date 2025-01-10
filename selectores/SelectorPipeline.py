@@ -97,9 +97,10 @@ class SelectorPipeline:
         excluded_columns = (
             set(df_pre.drop(columns=["label"]).columns) - selected_columns
         )
-        print(f"Excluded feture columns: {excluded_columns}")
+        print(f"selected feture columns({len(selected_columns)}): {selected_columns}")
+        print(f"Excluded feture columns({len(excluded_columns)}): {excluded_columns}")
 
-        # dateを追加
+        # dateを追加45
         df_selected["date"] = df_with_label["date"]
 
         # symbolを一律で追加

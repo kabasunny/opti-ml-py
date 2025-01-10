@@ -43,6 +43,10 @@ class PeakTroughAnalyzer(FeatureCreatorABC):
             for idx in range(len(df)):
                 current_date = df.iloc[idx]["date"]
 
+                # trade_start_date 以降のデータのみ特徴量を計算
+                if current_date < trade_start_date:
+                    continue
+
                 # 現在のウィンドウを取得
                 if resample_rule:
                     try:
