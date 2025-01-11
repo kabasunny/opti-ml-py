@@ -5,18 +5,19 @@ from data.DataExtractor import DataExtractor
 from decorators.ArgsChecker import ArgsChecker
 from data.DataManager import DataManager
 from typing import List
+from models.ModelFactory import ModelFactory
 
 
 class ModelTrainPipeline:
-    @ArgsChecker((None, DataManager, ModelSaverLoader, List[BaseModelABC]), None)
+    @ArgsChecker((None, DataManager, ModelSaverLoader, List[str]), None)
     def __init__(
         self,
         training_and_test_manager: DataManager,
         saver_loader: ModelSaverLoader,
-        models: List[BaseModelABC],
+        model_types: List[str],
     ):
         self.training_and_test_manager = training_and_test_manager
-        self.models = models
+        self.models = ModelFactory.create_models(model_types)
         self.saver_loader = saver_loader
         self.X_train = None
         self.X_test = None

@@ -5,8 +5,8 @@ from datetime import datetime
 
 
 class ModelSaverLoader:
-    def __init__(self, model_base_path: str, model_file_ext: str):
-        self.model_base_path = model_base_path
+    def __init__(self, model_save_path: str, model_file_ext: str):
+        self.model_base_path = model_save_path
         self.model_file_ext = model_file_ext
 
     def save_models(self, models: List[object]):

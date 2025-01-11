@@ -1,10 +1,10 @@
 import pandas as pd
-from model_training import model_training
 from models.ModelSaverLoader import ModelSaverLoader
+from AutomatedPipeline import AutomatedPipeline
+from data.DataManager import DataManager
 
 
 def main():
-    # シンボルの配列を用意
     symbols = [
         # "1570",  # 意図的にエラーを発生するシンボル
         "7203",  # Toyota Motor Corporation
@@ -32,29 +32,43 @@ def main():
         "LogisticRegression",
     ]
 
-    # ----------------------model----------------------
-    model_save_path = "models/trained_models"
-    model_file_ext = "pkl"
-    model_saver_loader = ModelSaverLoader(model_save_path, model_file_ext)
+    model_saver_loader = ModelSaverLoader(
+        model_save_path="models/trained_models", model_file_ext="pkl"
+    )
 
-    # ----------------------feature----------------------
     feature_list_str = ["peak_trough", "fourier", "volume", "price", "past"]
 
-    model_created = False  # モデルが作成されたかどうかのフラグ
+    base_data_path = "data/stock_data"
+    file_ext = "parquet"
+
+    data_manager_names = [
+        "formated_raw",
+        "processed_raw",
+        "labeled",
+        "normalized_feature",
+        "selected_feature",
+        "training_and_test",
+        "practical",
+        "predictions",
+    ]
+
+    data_managers = {}
+    for name in data_manager_names:
+        data_managers[name] = DataManager(base_data_path, file_ext, name, end_date)
+
+    pipeline = AutomatedPipeline(
+        trade_start_date,
+        data_start_period,
+        end_date,
+        model_types,
+        feature_list_str,
+        model_saver_loader,
+        data_managers,
+    )
 
     while symbols:
         symbol = symbols.pop(0)
-        print(f"Symbol of current data: {symbol}")
-        model_created = model_training(
-            symbol,
-            trade_start_date,
-            data_start_period,
-            end_date,
-            model_types,
-            feature_list_str,
-            model_saver_loader,
-            model_created,
-        )
+        pipeline.process_symbol(symbol)
 
 
 if __name__ == "__main__":

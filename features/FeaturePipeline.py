@@ -6,13 +6,13 @@ from features.PastDataFeatureCreator import PastDataFeatureCreator
 
 
 class FeaturePipeline:
-    @ArgsChecker((None, DataManager, DataManager, list, pd.Timestamp), None)
+    @ArgsChecker((None, DataManager, DataManager, pd.Timestamp, list), None)
     def __init__(
         self,
         processed_data_manager: DataManager,
         normalized_f_d_manager: DataManager,
-        analyzers: list,
         trade_start_date: pd.Timestamp,
+        analyzers: list,
     ):
         self.normalizer = Normalizer()  # Normalizerクラスのインスタンスを作成
         self.processed_data_manager = processed_data_manager

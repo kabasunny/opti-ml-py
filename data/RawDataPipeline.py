@@ -6,9 +6,9 @@ from data.DataManager import DataManager  # DataManager クラスのインポー
 
 class RawDataPipeline:
     @ArgsChecker(
-        (None, StockDataFetcherABC, DataManager), None
+        (None, DataManager, StockDataFetcherABC), None
     )  # fetcherがStockDataFetcherABCを継承し、saverがRawDataManagerであるかチェック
-    def __init__(self, fetcher: StockDataFetcherABC, raw_data_manager: DataManager):
+    def __init__(self, raw_data_manager: DataManager, fetcher: StockDataFetcherABC):
         self.fetcher = fetcher  # データを取得するオブジェクトを設定
         self.raw_data_manager = raw_data_manager  # データを保存するオブジェクトを設定
 
