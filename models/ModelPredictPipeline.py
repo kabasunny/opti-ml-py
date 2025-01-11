@@ -39,6 +39,9 @@ class ModelPredictPipeline:
         incorrect_count = practical_data[practical_data["label"] == 0].shape[0]
         ratio_pr = round(incorrect_count / correct_count, 1)
         print(f"prediction... correct : incorrect = 1 : {ratio_pr}")
+        print(f'correct_count:{correct_count}')
+        print(f'incorrect_count:{incorrect_count}')
+
 
         # 特徴量を抽出
         features = practical_data.drop(
@@ -93,7 +96,8 @@ class ModelPredictPipeline:
         #     )
         ratio_add = round(len(incorrect_data) / len(correct_data), 1)
         print(f"Additional training... correct : incorrect = 1 : {ratio_add}")
-
+        print(f'len(correct_data):{len(correct_data)}')
+        print(f'len(incorrect_data):{len(incorrect_data)}')
         X_train, X_test, y_train, y_test = (
             DataForModelPreparation.add_training_and_test_data(
                 correct_data, incorrect_data

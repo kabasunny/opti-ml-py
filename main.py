@@ -8,13 +8,13 @@ def main():
     symbols = [
         "1570",  # 意図的にエラーを発生するシンボル
         "7203",  # Toyota Motor Corporation
-        # "7201",  # Honda Motor Co., Ltd.
-        # "7261",  # Mazda Motor Corporation
-        # "7269",  # Suzuki Motor Corporation
-        # "7270",  # Subaru Corporation
-        # "7202",  # Isuzu Motors Limited
-        # "7205",  # Hino Motors, Ltd.
-        # "7224",  # Shizuoka Daihatsu Motor Co., Ltd.
+        "7201",  # Honda Motor Co., Ltd.
+        "7261",  # Mazda Motor Corporation
+        "7269",  # Suzuki Motor Corporation
+        "7270",  # Subaru Corporation
+        "7202",  # Isuzu Motors Limited
+        "7205",  # Hino Motors, Ltd.
+        "7224",  # Shizuoka Daihatsu Motor Co., Ltd.
     ]
 
     before_period_days = 365 * 2  # 特徴量生成に必要なデータ期間
