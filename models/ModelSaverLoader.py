@@ -32,11 +32,10 @@ class ModelSaverLoader:
                 print(f"{model_type}のモデルファイルが存在しません。")
         return models
 
-    def check_existing_models(self, models: List[object]) -> bool:
+    def check_existing_models(self, model_names: List[str]) -> bool:
         """保存済みモデルが存在するかチェック"""
-        for model in models:
-            model_name = model.__class__.__name__.replace("Model", "")
-            today_date = datetime.today().strftime("%Y%m%d")
+        today_date = datetime.today().strftime("%Y%m%d")
+        for model_name in model_names:
             filepath = f"{self.model_base_path}/{model_name}_{today_date}.{self.model_file_ext}"
             if os.path.exists(filepath):
                 return True

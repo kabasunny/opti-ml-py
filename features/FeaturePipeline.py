@@ -6,19 +6,19 @@ from features.PastDataFeatureCreator import PastDataFeatureCreator
 
 
 class FeaturePipeline:
-    @ArgsChecker((None, DataManager, DataManager, pd.Timestamp, list), None)
+    @ArgsChecker((None, DataManager, DataManager, int, list), None)
     def __init__(
         self,
         processed_data_manager: DataManager,
         normalized_f_d_manager: DataManager,
-        trade_start_date: pd.Timestamp,
+        before_period_days: int,
         analyzers: list,
     ):
         self.normalizer = Normalizer()  # Normalizerクラスのインスタンスを作成
         self.processed_data_manager = processed_data_manager
         self.normalized_f_d_manager = normalized_f_d_manager
         self.analyzers = analyzers
-        self.trade_start_date = trade_start_date
+        self.before_period_days = before_period_days
 
     @ArgsChecker((None, str), None)
     def run(self, symbol):
@@ -31,16 +31,19 @@ class FeaturePipeline:
         # print("Run Feature creation pipeline")
         # データをロード
         df = self.processed_data_manager.load_data(symbol)
+        # trade_start_day を計算
+        first_date = pd.to_datetime(df["date"].iloc[0])
+        trade_start_date = first_date + pd.DateOffset(days=self.before_period_days)
 
         # 特徴量を作成
         # dateカラムをTimestamp型に変換
         df["date"] = pd.to_datetime(df["date"])
 
         for analyzer in self.analyzers:
-            df = analyzer.create_features(df, self.trade_start_date)
+            df = analyzer.create_features(df, trade_start_date)
 
         # trade_start_date 以降の日付のデータをフィルタリング
-        df_with_features = df[df["date"] >= self.trade_start_date].copy()
+        df_with_features = df[df["date"] >= trade_start_date].copy()
 
         # 指定された列を削除
         columns_to_drop = [

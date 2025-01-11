@@ -4,20 +4,22 @@ from decorators.ArgsChecker import ArgsChecker  # デコレータクラスをイ
 
 
 class DataManager:
-    @ArgsChecker((None, str, str, str, str), None)
-    def __init__(self, base_path: str, file_ext: str, data_name: str, end_date: str):
+    @ArgsChecker((None, str, str, str), None)
+    def __init__(self, base_path: str, data_manager_name: str, file_ext: str):
         self.base_path = base_path
         self.file_ext = file_ext
-        self.data_name = data_name
-        self.end_date = end_date
+        self.d_m_name = data_manager_name
 
-    def generate_path(self, symbol: str) -> str:
-        return f"{self.base_path}/{self.data_name}/{symbol}_{self.end_date}.{self.file_ext}"
+    def generate_path(self, symbol: str, end_date: str) -> str:
+        return f"{self.base_path}/{self.d_m_name}/{symbol}_{end_date}.{self.file_ext}"
 
     @ArgsChecker((None, pd.DataFrame, str), None)
     def save_data(self, df: pd.DataFrame, symbol: str):
         """ラベルデータを保存するメソッド"""
-        path = self.generate_path(symbol)
+        # end_date を計算
+        end_date = pd.to_datetime(df["date"].iloc[-1]).strftime("%Y-%m-%d")
+
+        path = self.generate_path(symbol, end_date)
         try:
             os.makedirs(os.path.dirname(path), exist_ok=True)
             if path.endswith(".csv"):
@@ -31,7 +33,26 @@ class DataManager:
     @ArgsChecker((None, str), pd.DataFrame)
     def load_data(self, symbol: str) -> pd.DataFrame:
         """ラベルデータをロードするメソッド"""
-        path = self.generate_path(symbol)
+        dir_path = f"{self.base_path}/{self.d_m_name}/"
+        files = [
+            f
+            for f in os.listdir(dir_path)
+            if f.startswith(symbol) and f.endswith(self.file_ext)
+        ]
+
+        if not files:
+            print(f"{symbol}のデータファイルが存在しません。")
+            return pd.DataFrame()
+
+        # 最も新しい日付を含むファイルを選択
+        latest_file = max(
+            files,
+            key=lambda x: pd.to_datetime(
+                x.split("_")[-1].replace(f".{self.file_ext}", "")
+            ),
+        )
+        path = os.path.join(dir_path, latest_file)
+
         try:
             if path.endswith(".csv"):
                 df = pd.read_csv(path)

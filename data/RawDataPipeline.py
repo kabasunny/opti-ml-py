@@ -15,11 +15,13 @@ class RawDataPipeline:
     @ArgsChecker((None, str), None)  # 引数チェックデコレータを適用
     def run(self, symbol):
         # print("Run Data pipeline")
-        raw_data = self.fetcher.fetch_data()  # データを取得
+        raw_data = self.fetcher.fetch_data(symbol)  # データを取得
         # print("Data fetching completed.")  # データ取得完了のメッセージを表示
         # print(f"raw_data{len(raw_data)}")
 
-        formated_data = self.fetcher.format_data(raw_data)  # データをフォーマット
+        formated_data = self.fetcher.format_data(
+            raw_data, symbol
+        )  # データをフォーマット
         # print("Data standardization completed.")  # データ標準化完了のメッセージを表示
 
         if formated_data.empty:  # 標準化されたデータが空かどうかを確認

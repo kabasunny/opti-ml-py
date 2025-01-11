@@ -8,11 +8,15 @@ from decorators.ArgsChecker import ArgsChecker  # デコレータクラスをイ
 
 
 class TroughLabelCreator(LabelCreatorABC):
-    def __init__(self, trade_start_date: pd.Timestamp):
-        self.trade_start_date = trade_start_date
+    def __init__(
+        self,
+    ):
+        pass
 
-    @ArgsChecker((None, pd.DataFrame), pd.DataFrame)
-    def create_labels(self, df: pd.DataFrame) -> pd.DataFrame:
+    @ArgsChecker((None, pd.DataFrame, pd.Timestamp), pd.DataFrame)
+    def create_labels(
+        self, df: pd.DataFrame, trade_start_date: pd.Timestamp
+    ) -> pd.DataFrame:
         """
         週足ベースで底値付近を正解
         ピークから逆算し、ある程度の値幅がある場合に正解
@@ -21,7 +25,7 @@ class TroughLabelCreator(LabelCreatorABC):
         df["date"] = pd.to_datetime(df["date"])
 
         # trade_start_date 以降の日付のデータをフィルタリング
-        df = df[df["date"] >= self.trade_start_date].copy()
+        df = df[df["date"] >= trade_start_date].copy()
 
         # トラフおよびピークを検出
         troughs = TroughAndPeakDetector.detect_troughs(df["close"])
