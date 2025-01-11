@@ -8,12 +8,12 @@ from typing import List
 
 
 class ModelTrainPipeline:
-    @ArgsChecker((None, DataManager, List[BaseModelABC], ModelSaverLoader), None)
+    @ArgsChecker((None, DataManager, ModelSaverLoader, List[BaseModelABC]), None)
     def __init__(
         self,
         training_and_test_manager: DataManager,
-        models: List[BaseModelABC],
         saver_loader: ModelSaverLoader,
+        models: List[BaseModelABC],
     ):
         self.training_and_test_manager = training_and_test_manager
         self.models = models
@@ -23,17 +23,9 @@ class ModelTrainPipeline:
         self.y_train = None
         self.y_test = None
 
-    def run(self):
-        full_data = self.training_and_test_manager.load_data()
-        self.X_train, self.X_test, self.y_train, self.y_test = (
-            DataExtractor.extract_data(full_data)
-        )
-        self.models, results_df = ModelTrainer.train(
-            self.models, self.X_train, self.y_train, self.X_test, self.y_test
-        )
-        print(results_df)
+    def run(self, symbol):
 
-        # モデルの保存前に確認
+        # モデルが存在する場合、事前に確認
         if self.saver_loader.check_existing_models(self.models):
             confirm = (
                 input("現在のモデルを上書きしてよいですか? (Y/N): ").strip().upper()
@@ -42,8 +34,15 @@ class ModelTrainPipeline:
                 print("モデルの上書きをパスしました")
                 return
 
+        full_data = self.training_and_test_manager.load_data(symbol)
+        self.X_train, self.X_test, self.y_train, self.y_test = (
+            DataExtractor.extract_data(full_data)
+        )
+        self.models, results_df = ModelTrainer.train(
+            self.models, self.X_train, self.y_train, self.X_test, self.y_test
+        )
+        print(results_df)
+
         self.saver_loader.save_models(self.models)
-        # self.models = self.saver_loader.load_models()
-        # ModelTrainer.evaluate(self.models, self.X_test, self.y_test)
 
         print("Model Train Pipeline completed successfully")

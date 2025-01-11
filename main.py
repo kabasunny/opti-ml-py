@@ -1,6 +1,6 @@
 import pandas as pd
-from create_model import create_model
-from retrain_model import retrain_model
+from model_training import model_training
+from models.ModelSaverLoader import ModelSaverLoader
 
 
 def main():
@@ -32,26 +32,29 @@ def main():
         "LogisticRegression",
     ]
 
+    # ----------------------model----------------------
+    model_save_path = "models/trained_models"
+    model_file_ext = "pkl"
+    model_saver_loader = ModelSaverLoader(model_save_path, model_file_ext)
+
+    # ----------------------feature----------------------
+    feature_list_str = ["peak_trough", "fourier", "volume", "price", "past"]
+
     model_created = False  # モデルが作成されたかどうかのフラグ
 
     while symbols:
         symbol = symbols.pop(0)
-        print(f'Symbol of current data: {symbol}')
-
-        try:
-            if not model_created:
-                create_model(
-                    symbol, trade_start_date, data_start_period, end_date, model_types
-                )
-                model_created = True
-            else:
-                retrain_model(
-                    symbol, trade_start_date, data_start_period, end_date, model_types
-                )
-        except Exception as e:
-            print(f"{symbol} の処理中にエラーが発生しました: {e}")
-            # エラーが発生した場合スキップします
-            continue
+        print(f"Symbol of current data: {symbol}")
+        model_created = model_training(
+            symbol,
+            trade_start_date,
+            data_start_period,
+            end_date,
+            model_types,
+            feature_list_str,
+            model_saver_loader,
+            model_created,
+        )
 
 
 if __name__ == "__main__":

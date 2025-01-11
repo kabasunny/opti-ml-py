@@ -4,7 +4,7 @@ from data.DataManager import DataManager
 from models.ModelPredictor import ModelPredictor
 from data.DataExtractor import DataExtractor
 from typing import List
-from data.DataForModelPreparation import DataPreparation
+from data.DataForModelPreparation import DataForModelPreparation
 from models.ModelTrainer import ModelTrainer
 
 
@@ -24,12 +24,12 @@ class ModelPredictPipeline:
         self.model_types = model_types
         self.models = None
 
-    def run(self):
+    def run(self, symbol):
         # モデルの読み込み
         self.models = self.model_saver_loader.load_models(self.model_types)
 
         # 実践用データの読み込み
-        practical_data = self.practical_data_manager.load_data()
+        practical_data = self.practical_data_manager.load_data(symbol)
 
         # インデックスでソート
         practical_data = practical_data.sort_values(by="date").reset_index(drop=True)
@@ -49,7 +49,7 @@ class ModelPredictPipeline:
         predictions_df["date"] = practical_data["date"]
         predictions_df["symbol"] = practical_data["symbol"]
         predictions_df["label"] = practical_data["label"]
-        self.predictions_data_manager.save_data(predictions_df)
+        self.predictions_data_manager.save_data(predictions_df, symbol)
 
         # モデルの評価
         evaluations_df = ModelPredictor.evaluate(
@@ -64,7 +64,7 @@ class ModelPredictPipeline:
         rate = 3
         print(f"Additional training... \ncorrect : incorrect = 1 : {rate}")
         _, re_featuer, _, re_label = DataExtractor.extract_data(
-            self.training_and_test_manager.load_data()
+            self.training_and_test_manager.load_data(symbol)
         )
 
         # 再利用データを結合
@@ -75,7 +75,9 @@ class ModelPredictPipeline:
         full_data = re_featuer.copy()
         full_data["label"] = re_label
 
-        correct_data, incorrect_data = DataPreparation.split_data_by_label(full_data)
+        correct_data, incorrect_data = DataForModelPreparation.split_data_by_label(
+            full_data
+        )
 
         # correct_data : incorrect_data = 1 : rate の比率にするため、incorrect_dataの数を調整
         desired_incorrect_size = rate * correct_data.shape[0]
@@ -84,8 +86,10 @@ class ModelPredictPipeline:
                 n=desired_incorrect_size, random_state=42
             )
 
-        X_train, X_test, y_train, y_test = DataPreparation.add_training_and_test_data(
-            correct_data, incorrect_data
+        X_train, X_test, y_train, y_test = (
+            DataForModelPreparation.add_training_and_test_data(
+                correct_data, incorrect_data
+            )
         )
 
         self.models, results_df = ModelTrainer.train(

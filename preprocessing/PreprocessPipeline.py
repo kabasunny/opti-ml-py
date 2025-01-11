@@ -16,12 +16,12 @@ class PreprocessPipeline:
         self.raw_data_manager = raw_data_manager
         self.processed_data_manager = processed_data_manager
 
-    @ArgsChecker((None,), None)
-    def run(self):
+    @ArgsChecker((None, str), None)
+    def run(self, symbol):
         """データパイプラインの実行"""
         # print("Run Preprocess pipeline")
         # データの読み込み
-        df = self.raw_data_manager.load_data()
+        df = self.raw_data_manager.load_data(symbol)
         # print("Raw data loaded successfully")
 
         # データの前処理
@@ -39,7 +39,7 @@ class PreprocessPipeline:
         # print("Normalized data")
 
         # データの保存
-        self.processed_data_manager.save_data(df)
+        self.processed_data_manager.save_data(df, symbol)
         # print("Processed data saved successfully")
 
         print("Preprocess pipeline completed successfully")

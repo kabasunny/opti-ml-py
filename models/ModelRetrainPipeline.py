@@ -21,8 +21,8 @@ class ModelRetrainPipeline:
         self.y_test = None
         self.models = None
 
-    def run(self):
-        full_data = self.training_and_test_manager.load_data()
+    def run(self, symbol):
+        full_data = self.training_and_test_manager.load_data(symbol)
         self.X_train, self.X_test, self.y_train, self.y_test = (
             DataExtractor.extract_data(full_data)
         )

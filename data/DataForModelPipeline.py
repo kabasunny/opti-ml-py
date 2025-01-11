@@ -1,4 +1,4 @@
-from data.DataForModelPreparation import DataPreparation
+from data.DataForModelPreparation import DataForModelPreparation
 from decorators.ArgsChecker import ArgsChecker  # デコレータクラスをインポート
 from data.DataManager import DataManager
 
@@ -26,16 +26,19 @@ class DataForModelPipeline:
         self.training_and_test_data_manager = training_and_test_data_manager
         self.practical_data_manager = practical_data_manager
 
-    @ArgsChecker((), None)
-    def run(self):
+    @ArgsChecker((None, str), None)
+    def run(self, symbol):
         # print("Run Data For Model Pipeline")
 
         # ラベル付きのデータを作成する
-        full_data = DataPreparation.create_full_data(
+        full_data = DataForModelPreparation.create_full_data(
             self.label_data_manager,
             self.selected_feature_manager,
+            symbol,
         )
-        correct_data, incorrect_data = DataPreparation.split_data_by_label(full_data)
+        correct_data, incorrect_data = DataForModelPreparation.split_data_by_label(
+            full_data
+        )
 
         # データをモデル用に分割
         (
@@ -43,24 +46,26 @@ class DataForModelPipeline:
             correct_data_practical_test,
             incorrect_data_train_eval,
             incorrect_data_practical_test,
-        ) = DataPreparation.split_data_for_modeling(correct_data, incorrect_data)
+        ) = DataForModelPreparation.split_data_for_modeling(
+            correct_data, incorrect_data
+        )
 
         # 訓練データとテストデータを準備
-        combined_data = DataPreparation.prepare_training_and_test_data(
+        combined_data = DataForModelPreparation.prepare_training_and_test_data(
             correct_data_train_eval,
             incorrect_data_train_eval,
         )
         # print(f"combined_data{len(combined_data)}")
 
         # 訓練データとテストデータを保存
-        self.training_and_test_data_manager.save_data(combined_data)
+        self.training_and_test_data_manager.save_data(combined_data, symbol)
 
         # 実践テストデータを準備
-        practical_data = DataPreparation.prepare_practical_data(
+        practical_data = DataForModelPreparation.prepare_practical_data(
             correct_data_practical_test, incorrect_data_practical_test
         )
         # print(f"practical_data{len(practical_data)}")
         # 実践テストデータを保存
-        self.practical_data_manager.save_data(practical_data)
+        self.practical_data_manager.save_data(practical_data, symbol)
 
         print("Data For Model Pipeline completed successfully")

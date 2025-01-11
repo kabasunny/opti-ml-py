@@ -36,4 +36,5 @@ class ModelFactory:
     @staticmethod
     @ArgsChecker((None, list[BaseModelABC]), list[BaseModelABC])
     def create_models(model_types: list[str]) -> list[BaseModelABC]:
+        # print(model_types)
         return [ModelFactory.create_model(model_type) for model_type in model_types]

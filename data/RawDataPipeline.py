@@ -12,8 +12,8 @@ class RawDataPipeline:
         self.fetcher = fetcher  # データを取得するオブジェクトを設定
         self.raw_data_manager = raw_data_manager  # データを保存するオブジェクトを設定
 
-    @ArgsChecker((None,), None)  # 引数チェックデコレータを適用
-    def run(self):
+    @ArgsChecker((None, str), None)  # 引数チェックデコレータを適用
+    def run(self, symbol):
         # print("Run Data pipeline")
         raw_data = self.fetcher.fetch_data()  # データを取得
         # print("Data fetching completed.")  # データ取得完了のメッセージを表示
@@ -26,7 +26,7 @@ class RawDataPipeline:
             print("No data found for the specified parameters")
             return  # 処理を終了
 
-        self.raw_data_manager.save_data(formated_data)  # データを保存
+        self.raw_data_manager.save_data(formated_data, symbol)  # データを保存
         # print("Data saving completed")  # データ保存完了のメッセージを表示
 
         print("Data pipeline completed successfully")

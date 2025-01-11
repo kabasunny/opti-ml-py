@@ -12,12 +12,18 @@ class LabelCreatePipeline:
         self.label_data_manager = label_data_manager
         self.label_creator = label_creator
 
-    @ArgsChecker((None,), None)
-    def run(self):
+    @ArgsChecker(
+        (
+            None,
+            str,
+        ),
+        None,
+    )
+    def run(self, symbol):
         """データパイプラインの実行"""
         # print("Run Label creation pipeline")
         # データの読み込み
-        df = self.raw_data_manager.load_data()
+        df = self.raw_data_manager.load_data(symbol)
         # print("Raw data loaded successfully")
 
         # ラベルの作成
@@ -25,9 +31,8 @@ class LabelCreatePipeline:
         # print("Labels created")
         # print(f"labels{len(labels)}")
 
-
         # ラベルデータの保存
-        self.label_data_manager.save_data(labels)
+        self.label_data_manager.save_data(labels, symbol)
         # print("Labels saved successfully")
 
         print("Label creation pipeline completed successfully")

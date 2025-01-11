@@ -13,13 +13,13 @@ class SelectorPipeline:
         selected_f_d_manager: DataManager,
         selectors: list,
     ):
-        self.target_data_manager = label_data_manager
+        self.label_data_manager = label_data_manager
         self.normalized_f_d_manager = normalized_f_d_manager
         self.selected_f_d_manager = selected_f_d_manager
         self.selectors = selectors
 
-    @ArgsChecker((), None)
-    def run(self) -> None:
+    @ArgsChecker((None, str), None)
+    def run(self, symbol) -> None:
         """
         特徴量選択を一連の流れで実行するメソッド
 
@@ -28,14 +28,14 @@ class SelectorPipeline:
         """
         # print("Run Selector pipeline")
         # 正規化済みデータをロード
-        df_normalized = self.normalized_f_d_manager.load_data()
+        df_normalized = self.normalized_f_d_manager.load_data(symbol)
 
         # date カラムを Timestamp 型に変換
         if "date" in df_normalized.columns:
             df_normalized["date"] = pd.to_datetime(df_normalized["date"])
 
         # ラベルデータを読み込んでマージ
-        target_df = self.target_data_manager.load_data()
+        target_df = self.label_data_manager.load_data(symbol)
         if "date" in target_df.columns:
             target_df["date"] = pd.to_datetime(target_df["date"])
         df_with_label = df_normalized.merge(
@@ -114,6 +114,6 @@ class SelectorPipeline:
         df_selected = df_selected[columns_order]
 
         # 結果を保存
-        self.selected_f_d_manager.save_data(df_selected)
+        self.selected_f_d_manager.save_data(df_selected, symbol)
 
         print("Selector pipeline completed successfully")

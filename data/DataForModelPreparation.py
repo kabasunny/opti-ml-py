@@ -4,16 +4,16 @@ from data.DataManager import DataManager
 from sklearn.model_selection import train_test_split
 
 
-class DataPreparation:
+class DataForModelPreparation:
     @staticmethod
-    @ArgsChecker((DataManager, DataManager), pd.DataFrame)  # 型チェックを追加
-    def create_full_data(label_data_manager, feature_data_manager):
+    @ArgsChecker((DataManager, DataManager, str), pd.DataFrame)  # 型チェックを追加
+    def create_full_data(label_data_manager, feature_data_manager, symbol):
 
         # ラベルデータを読み込み、label列のみを付加する
-        label_data = label_data_manager.load_data()[["date", "symbol", "label"]]
+        label_data = label_data_manager.load_data(symbol)[["date", "symbol", "label"]]
 
         # 特徴量データを読み込む
-        feature_data = feature_data_manager.load_data()
+        feature_data = feature_data_manager.load_data(symbol)
 
         # データを結合する
         full_data = feature_data.merge(label_data, on=["date", "symbol"], how="left")

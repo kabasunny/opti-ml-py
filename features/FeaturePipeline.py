@@ -4,6 +4,7 @@ from decorators.ArgsChecker import ArgsChecker  # デコレータクラスをイ
 from data.DataManager import DataManager
 from features.PastDataFeatureCreator import PastDataFeatureCreator
 
+
 class FeaturePipeline:
     @ArgsChecker((None, DataManager, DataManager, list, pd.Timestamp), None)
     def __init__(
@@ -19,8 +20,8 @@ class FeaturePipeline:
         self.analyzers = analyzers
         self.trade_start_date = trade_start_date
 
-    @ArgsChecker((None,), None)
-    def run(self):
+    @ArgsChecker((None, str), None)
+    def run(self, symbol):
         """
         特徴量作成と選択を一連の流れで実行するメソッド
 
@@ -29,7 +30,7 @@ class FeaturePipeline:
         """
         # print("Run Feature creation pipeline")
         # データをロード
-        df = self.processed_data_manager.load_data()
+        df = self.processed_data_manager.load_data(symbol)
 
         # 特徴量を作成
         # dateカラムをTimestamp型に変換
@@ -79,7 +80,6 @@ class FeaturePipeline:
             "macd",
             "macd_signal",
             "macd_hist",
-
         ]
 
         # 1個前から10個前の特徴量を正規化する列に追加
@@ -92,24 +92,6 @@ class FeaturePipeline:
             df_with_features, columns_to_normalize
         )
 
-        self.normalized_f_d_manager.save_data(df_normalized)
+        self.normalized_f_d_manager.save_data(df_normalized, symbol)
 
         print("Feature creation pipeline completed successfully")
-
-# 使用例
-if __name__ == "__main__":
-    # データマネージャの作成（例）
-    processed_data_manager = DataManager("path_to_processed_data")
-    normalized_f_d_manager = DataManager("path_to_normalized_data")
-
-    # 特徴量生成器のリストに PastDataFeatureCreator を追加
-    analyzers = [
-        PastDataFeatureCreator(),
-        # 他のアナライザもここに追加できます
-    ]
-
-    # FeaturePipeline の作成と実行
-    feature_pipeline = FeaturePipeline(
-        processed_data_manager, normalized_f_d_manager, analyzers, pd.Timestamp("2023-01-01")
-    )
-    feature_pipeline.run()
