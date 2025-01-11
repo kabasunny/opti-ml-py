@@ -47,10 +47,13 @@ class DataForModelPreparation:
         # )
         # CASE2:全数の半分の数
         incorrect_data_train_eval = incorrect_data.sample(frac=0.5, random_state=42)
-
         incorrect_data_practical_test = incorrect_data.drop(
             incorrect_data_train_eval.index
         )
+        print(f"correct_data_train_eval:{len(correct_data_train_eval)}")
+        print(f"correct_data_practical_test:{len(correct_data_practical_test)}")
+        print(f"incorrect_data_train_eval:{len(incorrect_data_train_eval)}")
+        print(f"incorrect_data_practical_test:{len(incorrect_data_practical_test)}")
         return (
             correct_data_train_eval,
             correct_data_practical_test,

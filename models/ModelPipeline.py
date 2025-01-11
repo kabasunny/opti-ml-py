@@ -11,11 +11,11 @@ class ModelPipeline:
     @ArgsChecker((None, DataManager, ModelSaverLoader, List[str]), None)
     def __init__(
         self,
-        training_and_test_manager: DataManager,
+        training_and_test_data_manager: DataManager,
         saver_loader: ModelSaverLoader,
         model_types: List[str],
     ):
-        self.training_and_test_manager = training_and_test_manager
+        self.t_a_t_m = training_and_test_data_manager
         self.saver_loader = saver_loader
         self.model_types = model_types
         self.model_created = False
@@ -42,7 +42,13 @@ class ModelPipeline:
             print("Created new models for training")
             self.model_created = True
 
-        full_data = self.training_and_test_manager.load_data(symbol)
+        full_data = self.t_a_t_m.load_data(symbol)
+        # 正解と不正解の数を抽出
+        correct_count = full_data[full_data["label"] == 1].shape[0]
+        incorrect_count = full_data[full_data["label"] == 0].shape[0]
+        ratio_tt = round(incorrect_count / correct_count, 1)
+        print(f"traing... correct : incorrect = 1 : {ratio_tt}")
+
         self.X_train, self.X_test, self.y_train, self.y_test = (
             DataExtractor.extract_data(full_data)
         )

@@ -34,6 +34,12 @@ class ModelPredictPipeline:
         # インデックスでソート
         practical_data = practical_data.sort_values(by="date").reset_index(drop=True)
 
+        # 正解と不正解の数を抽出
+        correct_count = practical_data[practical_data["label"] == 1].shape[0]
+        incorrect_count = practical_data[practical_data["label"] == 0].shape[0]
+        ratio_pr = round(incorrect_count / correct_count, 1)
+        print(f"prediction... correct : incorrect = 1 : {ratio_pr}")
+
         # 特徴量を抽出
         features = practical_data.drop(
             columns=["date", "symbol", "label"]
@@ -61,8 +67,6 @@ class ModelPredictPipeline:
 
         # 追加トレーニング 非学習用廃棄データを再利用して学習
 
-        rate = 3
-        print(f"Additional training... \ncorrect : incorrect = 1 : {rate}")
         _, re_featuer, _, re_label = DataExtractor.extract_data(
             self.training_and_test_manager.load_data(symbol)
         )
@@ -80,11 +84,15 @@ class ModelPredictPipeline:
         )
 
         # correct_data : incorrect_data = 1 : rate の比率にするため、incorrect_dataの数を調整
-        desired_incorrect_size = rate * correct_data.shape[0]
-        if incorrect_data.shape[0] > desired_incorrect_size:
-            incorrect_data = incorrect_data.sample(
-                n=desired_incorrect_size, random_state=42
-            )
+        # ratio_add = 3
+        # print(f"Additional training... correct : incorrect = 1 : {ratio_add}")
+        # desired_incorrect_size = ratio_add * correct_data.shape[0]
+        # if incorrect_data.shape[0] > desired_incorrect_size:
+        #     incorrect_data = incorrect_data.sample(
+        #         n=desired_incorrect_size, random_state=42
+        #     )
+        ratio_add = round(len(incorrect_data) / len(correct_data), 1)
+        print(f"Additional training... correct : incorrect = 1 : {ratio_add}")
 
         X_train, X_test, y_train, y_test = (
             DataForModelPreparation.add_training_and_test_data(
