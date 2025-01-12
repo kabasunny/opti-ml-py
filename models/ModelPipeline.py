@@ -43,11 +43,13 @@ class ModelPipeline:
             self.model_created = True
 
         full_data = self.t_a_t_m.load_data(symbol)
+        # print(f"full_data{len(full_data)}")
         # 正解と不正解の数を抽出
         correct_count = full_data[full_data["label"] == 1].shape[0]
         incorrect_count = full_data[full_data["label"] == 0].shape[0]
         ratio_tt = round(incorrect_count / correct_count, 1)
-        print(f"traing... correct : incorrect = 1 : {ratio_tt}")
+        print(f"traing... correct:incorrect = 1:{ratio_tt}")
+        print(f"correct:{correct_count}, incorrect:{incorrect_count}")
 
         self.X_train, self.X_test, self.y_train, self.y_test = (
             DataExtractor.extract_data(full_data)

@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 from decorators.ArgsChecker import ArgsChecker  # デコレータクラスをインポート
+from datetime import datetime
 
 
 class DataManager:
@@ -10,16 +11,16 @@ class DataManager:
         self.file_ext = file_ext
         self.d_m_name = data_manager_name
 
-    def generate_path(self, symbol: str, end_date: str) -> str:
-        return f"{self.base_path}/{self.d_m_name}/{symbol}_{end_date}.{self.file_ext}"
+    def generate_path(self, symbol: str, date_str: str) -> str:
+        return f"{self.base_path}/{self.d_m_name}/{symbol}_{date_str}.{self.file_ext}"
 
     @ArgsChecker((None, pd.DataFrame, str), None)
     def save_data(self, df: pd.DataFrame, symbol: str):
         """ラベルデータを保存するメソッド"""
-        # end_date を計算
-        end_date = pd.to_datetime(df["date"].iloc[-1]).strftime("%Y-%m-%d")
+        # 現在の日付を計算
+        date_str = datetime.now().strftime("%Y-%m-%d")
 
-        path = self.generate_path(symbol, end_date)
+        path = self.generate_path(symbol, date_str)
         try:
             os.makedirs(os.path.dirname(path), exist_ok=True)
             if path.endswith(".csv"):

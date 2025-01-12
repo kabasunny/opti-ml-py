@@ -36,7 +36,7 @@ class TroughLabelCreator(LabelCreatorABC):
 
         pre_x = 5
         post_x = 20
-        high_x = 8.0  # high_x を float 型に変換
+        high_x = 10.0  # high_x を float 型に変換
 
         # トラフのインデックスに基づいて選択されたトラフを検出
         selected_period_troughs = (
