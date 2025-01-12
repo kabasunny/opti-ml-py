@@ -30,6 +30,7 @@ class LabelCreatePipeline:
 
         # ラベルの作成
         labels = self.label_creator.create_labels(df, trade_start_date)
+        # print(f"labels\n{labels.head(1)}")
 
         # ラベルデータの保存
         self.label_data_manager.save_data(labels, symbol)

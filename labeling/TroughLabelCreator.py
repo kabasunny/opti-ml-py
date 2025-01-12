@@ -26,6 +26,7 @@ class TroughLabelCreator(LabelCreatorABC):
 
         # trade_start_date 以降の日付のデータをフィルタリング
         df = df[df["date"] >= trade_start_date].copy()
+        # print(f"df1\n{df.head(1)}")
 
         # トラフおよびピークを検出
         troughs = TroughAndPeakDetector.detect_troughs(df["close"])
@@ -74,5 +75,5 @@ class TroughLabelCreator(LabelCreatorABC):
             "volume",
         ]
         df.drop(columns=columns_to_drop, inplace=True)
-
+        # print(f"df2\n{df.head(1)}")
         return df

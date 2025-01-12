@@ -20,6 +20,9 @@ class DataManager:
         # 現在の日付を計算
         date_str = datetime.now().strftime("%Y-%m-%d")
 
+        # 'Unnamed:'で始まる列を削除　ロード側が原因のため、こちらはコメントアウト
+        # df = df.loc[:, ~df.columns.str.contains("^Unnamed:")]
+
         path = self.generate_path(symbol, date_str)
         try:
             os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -59,6 +62,9 @@ class DataManager:
                 df = pd.read_csv(path)
             else:
                 df = pd.read_parquet(path)
+
+            # 'Unnamed:'で始まる列を削除 csvだとこの謎のカラムが追加され、エラーを起こす
+            df = df.loc[:, ~df.columns.str.contains("^Unnamed:")]
             # print(f"データが {path} からロードされました")
             return df
         except Exception as e:

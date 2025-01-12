@@ -36,7 +36,7 @@ def main():
     feature_list_str = ["peak_trough", "fourier", "volume", "price", "past"]
 
     base_data_path = "data/stock_data"
-    file_ext = "parquet"
+    file_ext = "csv"  # "parquet"
 
     data_manager_names = [
         "formated_raw",

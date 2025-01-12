@@ -31,6 +31,7 @@ class FeaturePipeline:
         # print("Run Feature creation pipeline")
         # データをロード
         df = self.processed_data_manager.load_data(symbol)
+        # print(f"df3\n{df.head(1)}")
         # trade_start_day を計算
         first_date = pd.to_datetime(df["date"].iloc[0])
         trade_start_date = first_date + pd.DateOffset(days=self.before_period_days)
@@ -44,6 +45,7 @@ class FeaturePipeline:
 
         # trade_start_date 以降の日付のデータをフィルタリング
         df_with_features = df[df["date"] >= trade_start_date].copy()
+        # print(f"df_with_features\n{df_with_features.head(1)}")
 
         # 指定された列を削除
         columns_to_drop = [
