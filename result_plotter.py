@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # データの読み込み
-stock_data_path = "data/stock_data/formated_raw/7224_2025-01-10.parquet"
-predictions_data_path = "data/stock_data/predictions/7224_2025-01-10.parquet"
+stock_data_path = "data/stock_data/formated_raw/1570_2025-01-12.parquet"
+predictions_data_path = "data/stock_data/predictions/1570_2025-01-12.parquet"
 
 stock_data = pd.read_parquet(stock_data_path)
 predictions_data = pd.read_parquet(predictions_data_path)

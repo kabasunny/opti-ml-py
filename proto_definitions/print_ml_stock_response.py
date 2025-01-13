@@ -1,4 +1,3 @@
-# ml-practice\proto_definitions\print_ml_stock_response.py
 def print_ml_stock_response_summary(ml_stock_response, num_items=5):
     print("MLStockResponse (summary):")
     symbol_data = ml_stock_response.symbol_data
@@ -25,6 +24,12 @@ def print_ml_stock_response_summary(ml_stock_response, num_items=5):
                 "...",
                 symbol_data_item.signals[-2:],
             )
+            print("  Model Predictions:")
+            for model, predictions in symbol_data_item.model_predictions.items():
+                print(
+                    f"    {model}: {predictions.prediction_dates[:2]} ... {predictions.prediction_dates[-2:]}"
+                )
+
         if i == num_items - 1 and len(symbol_data) > num_items * 2:
             print("...")
             i = len(symbol_data) - num_items - 1  # 残りの項目をスキップ
