@@ -1,3 +1,4 @@
+// proto_definitions\ml_stock_service.proto
 syntax = "proto3";
 
 // サービスの定義
@@ -31,6 +32,8 @@ message MLDailyData {
   float high = 3;
   float low = 4;
   float close = 5;
-  float adj_close = 6; // 使用しない予定
-  int64 volume = 7;
+  int64 volume = 6;
 }
+
+
+// protoc --python_out=. proto_definitions/ml_stock_service.proto

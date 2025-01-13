@@ -1,49 +1,57 @@
-# ml-practice\proto_definitions\proto_conversion.py
 import pandas as pd
 from proto_definitions.ml_stock_service_pb2 import (
     MLStockResponse,
     MLSymbolData,
     MLDailyData,
 )
-from proto_definitions.print_ml_stock_response import print_ml_stock_response_summary
 
 
-def convert_to_proto_response(symbol_signals, symbol_data_dict):
-    symbol_data_list = []
+def load_signals_csv(file_path):
+    df = pd.read_csv(file_path)
+    signal_dates = df[df["label"] == 1]["date"].tolist()
+    return signal_dates
 
-    for symbol, signals in symbol_signals.items():
-        daily_data_list = [
-            MLDailyData(
-                date=row.name.strftime("%Y-%m-%d"),
-                open=row["Open"],
-                high=row["High"],
-                low=row["Low"],
-                close=row["Close"],
-                adj_close=row["Adj Close"],
-                volume=int(row["Volume"]),
-            )
-            for index, row in symbol_data_dict[symbol].iterrows()
-        ]
-        symbol_data = MLSymbolData(
-            symbol=symbol,
-            daily_data=daily_data_list,
-            signals=[signal.strftime("%Y-%m-%d") for signal in signals],
+
+def load_daily_data_csv(file_path):
+    df = pd.read_csv(file_path)
+    return df
+
+
+def convert_to_proto_response(signals_csv_path, daily_data_csv_path):
+    signal_dates = load_signals_csv(signals_csv_path)
+    daily_data_df = load_daily_data_csv(daily_data_csv_path)
+
+    symbol = str(daily_data_df["symbol"].iloc[0])  # Symbol should be a string
+
+    daily_data_list = [
+        MLDailyData(
+            date=str(row["date"]),  # Ensure date is a string
+            open=float(row["open"]),  # Ensure open is a float
+            high=float(row["high"]),  # Ensure high is a float
+            low=float(row["low"]),  # Ensure low is a float
+            close=float(row["close"]),  # Ensure close is a float
+            volume=int(row["volume"]),  # Ensure volume is an integer
         )
-        symbol_data_list.append(symbol_data)
+        for index, row in daily_data_df.iterrows()
+    ]
 
-    ml_stock_response = MLStockResponse(symbol_data=symbol_data_list)
+    symbol_data = MLSymbolData(
+        symbol=symbol,
+        daily_data=daily_data_list,
+        signals=[str(signal) for signal in signal_dates],  # Ensure signals are strings
+    )
+
+    ml_stock_response = MLStockResponse(symbol_data=[symbol_data])
 
     return ml_stock_response
 
-    # print_ml_stock_response_summary(ml_stock_response)
-
 
 # MLStockResponse (summary):
-# Symbol: 8306.T
+# Symbol: 1570
 #   Daily Data:
-#     Date: 2005-09-29, Open: 1460.0, Close: 1450.0
-#     Date: 2005-09-30, Open: 1460.0, Close: 1490.0
+#     Date: 2012-04-09, Open: 4351.0, Close: 4351.0
+#     Date: 2012-04-10, Open: 4345.35986328125, Close: 4345.35986328125
 #     ...
-#     Date: 2024-12-25, Open: 1801.5, Close: 1800.0
-#     Date: 2024-12-26, Open: 1800.0, Close: 1800.5
-#   Signals: ['2015-01-19', '2011-03-17'] ... ['2024-12-25', '2024-12-26']
+#     Date: 2025-01-09, Open: 28050.0, Close: 27740.0
+#     Date: 2025-01-10, Open: 27295.0, Close: 27175.0
+#   Signals: ['2014-05-19', '2014-05-20'] ... ['2024-12-19', '2024-12-20']
