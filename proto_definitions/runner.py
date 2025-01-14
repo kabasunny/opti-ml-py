@@ -16,8 +16,8 @@ from proto_definitions.print_ml_stock_response import print_ml_stock_response_su
 
 if __name__ == "__main__":
     # 使用例
-    signals_csv_path = "data/stock_data/predictions/1570_2025-01-12.csv"
-    daily_data_csv_path = "data/stock_data/formated_raw/1570_2025-01-12.csv"
+    signals_csv_path = "data/stock_data/predictions/7224_2025-01-13.csv"
+    daily_data_csv_path = "data/stock_data/formated_raw/7224_2025-01-13.csv"
     save_directory = "proto_definitions/ml_stock_response"
 
     # Convert and save proto response

@@ -21,6 +21,7 @@ class AutomatedPipeline:
         feature_list_str,
         model_saver_loader,
         data_managers,
+        selectors  # 新しい引数を追加
     ):
         self.before_period_days = before_period_days
         self.model_types = model_types
@@ -29,6 +30,7 @@ class AutomatedPipeline:
         self.model_created = False  # モデルが作成済みかどうかのフラグ
 
         self.data_managers = data_managers
+        self.selectors = selectors
 
         # 各パイプラインをインスタンス変数として保持
         self.raw_data_pipeline = RawDataPipeline(
@@ -54,7 +56,7 @@ class AutomatedPipeline:
             self.data_managers["labeled"],
             self.data_managers["normalized_feature"],
             self.data_managers["selected_feature"],
-            SelectorFactory.create_selectors(),
+            SelectorFactory.create_selectors(self.selectors),  # 新しい引数をここで使用
         )
         self.data_for_model_pipeline = DataForModelPipeline(
             self.data_managers["labeled"],

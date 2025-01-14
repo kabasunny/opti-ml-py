@@ -2,6 +2,7 @@ from selectores.PCAFeatureSelector import PCAFeatureSelector
 from selectores.CorrelationFeatureSelector import CorrelationFeatureSelector
 from selectores.LassoFeatureSelector import LassoFeatureSelector
 from selectores.TreeFeatureSelector import TreeFeatureSelector
+from selectores.SelectAllSelector import SelectAllSelector
 
 
 class SelectorFactory:
@@ -10,18 +11,20 @@ class SelectorFactory:
     """
 
     @staticmethod
-    def create_selectors():
-        tree_selector = TreeFeatureSelector(
-            n_estimators=10, random_state=42
-        )  # より厳しい設定（n_estimatorsを減らす）
-        lasso_selector = LassoFeatureSelector(
-            alpha=0.005
-        )  # より厳しい設定（alphaを増やす）
-        pca_selector = PCAFeatureSelector(
-            n_components=3
-        )  # より厳しい設定（n_componentsを減らす）
-        corr_selector = CorrelationFeatureSelector(
-            threshold=0.5
-        )  # より厳しい設定（相関の閾値を下げる）
-        selectors = [tree_selector, lasso_selector, pca_selector, corr_selector]
+    def create_selectors(selector_names):
+        selectors = []
+        for selector_name in selector_names:
+            # コメントアウトは選択閾値を緩める方法
+            if selector_name == "Tree":
+                selectors.append(TreeFeatureSelector(n_estimators=50, random_state=42))  # n_estimatorsを増やす
+            elif selector_name == "Lasso":
+                selectors.append(LassoFeatureSelector(alpha=0.001))  # alphaを減らす
+            elif selector_name == "PCA":
+                selectors.append(PCAFeatureSelector(n_components=5))  # n_componentsを増やす
+            elif selector_name == "Correlation":
+                selectors.append(CorrelationFeatureSelector(threshold=0.8))  # thresholdを増やす
+            elif selector_name == "AllSelect": 
+                selectors.append(SelectAllSelector())
+            else:
+                raise ValueError(f"Unknown selector: {selector_name}")
         return selectors

@@ -3,30 +3,41 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # データの読み込み
-stock_data_path = "data/stock_data/formated_raw/1570_2025-01-12.parquet"
-predictions_data_path = "data/stock_data/predictions/1570_2025-01-12.parquet"
+stock_data_path = "data/stock_data/formated_raw/7201_2025-01-14.csv"
+predictions_data_path = "data/stock_data/predictions/7201_2025-01-14.csv"
 
-stock_data = pd.read_parquet(stock_data_path)
-predictions_data = pd.read_parquet(predictions_data_path)
+stock_data = pd.read_csv(stock_data_path)
+predictions_data = pd.read_csv(predictions_data_path)
 
 # 日付列をdatetime型に変換
 stock_data["date"] = pd.to_datetime(stock_data["date"])
-predictions_data["date"] = pd.to_datetime(predictions_data["date"])
+predictions_data["date"] = pd.to_datetime(stock_data["date"])
 
 # プロット用のデータフレームを作成
 plot_data = pd.merge(stock_data, predictions_data, on=["date", "symbol"])
 
 # モデルごとにプロットを作成
 models = [
-    "LightGBM",
-    "RandomForest",
-    "XGBoost",
-    "CatBoost",
-    "AdaBoost",
-    "SVM",
-    "KNeighbors",
-    "LogisticRegression",
-]
+        "LightGBM",
+        "RandomForest",
+        "XGBoost",
+        "CatBoost",
+        "AdaBoost",
+        "SVM",
+        "KNeighbors",
+        "LogisticRegression",
+        "DecisionTree",
+        "GradientBoosting",
+        "NaiveBayes",
+        "RidgeRegression",
+        "ExtraTrees",
+        "Bagging",
+        "Voting",
+        "Stacking",
+        "PassiveAggressive",
+        "Perceptron",
+        "SGD",
+    ]
 
 for model in models:
     plt.figure(figsize=(14, 7))
