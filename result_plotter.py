@@ -1,11 +1,13 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import os
 
 # データの読み込み
 stock_data_path = "data/stock_data/formated_raw/7203_2025-01-15.csv"
 predictions_data_path = "data/stock_data/predictions/7203_2025-01-15.csv"
 labels_data_path = "data/stock_data/labeled/7203_2025-01-15.csv"
+save_dir = "data/stock_data/png_image"
 
 stock_data = pd.read_csv(stock_data_path)
 predictions_data = pd.read_csv(predictions_data_path)
@@ -21,6 +23,11 @@ plot_data = pd.merge(stock_data, predictions_data, on=["date", "symbol"])
 plot_data = pd.merge(
     plot_data, labels_data, on=["date", "symbol"], suffixes=("", "_label")
 )
+
+
+# ディレクトリが存在しない場合は作成
+if not os.path.exists(save_dir):
+    os.makedirs(save_dir)
 
 # モデルごとにプロットを作成
 models = [
@@ -97,5 +104,9 @@ for model in models:
         plt.grid(True)
         plt.tight_layout()
 
-        # プロットを表示
-        plt.show()
+        # プロットを保存
+        save_path = os.path.join(save_dir, f"{model}_predictions.png")
+        plt.savefig(save_path)
+        plt.close()
+
+print(f"プロット画像が '{save_dir}' に保存されました。")
