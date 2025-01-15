@@ -97,9 +97,9 @@ class ChartPlotter:
 
 # 使用例
 if __name__ == "__main__":
-    symbol = "1570"
+    symbol = "7203"
     base_data_path = "data/stock_data"
-    file_ext = "parquet"
+    file_ext = "csv"  # parquet
 
     # DataManager クラスを使用してデータをロード
     manager_base = DataManager(base_data_path, "formated_raw", file_ext)

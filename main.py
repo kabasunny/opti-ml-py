@@ -4,15 +4,26 @@ from AutomatedPipeline import AutomatedPipeline
 from data.DataManager import DataManager
 from selectores.SelectorFactory import SelectorFactory
 
+
 def main():
     symbols = [
-        "1570",  # 意図的にエラーを発生するシンボル
-        "7261",  # Mazda Motor Corporation
-        "7269",  # Suzuki Motor Corporation
-        "7270",  # Subaru Corporation
-        "7202",  # Isuzu Motors Limited
-        "7205",  # Hino Motors, Ltd.
-        "7224",  # Shizuoka Daihatsu Motor Co., Ltd.
+        "6146",
+        "6857",
+        "7013",
+        "6920",
+        "3498",
+        "1570",
+        "5803",
+        "8306",
+        "3697",
+        "7011",
+        # "1570",  # 意図的にエラーを発生するシンボル
+        # "7261",  # Mazda Motor Corporation
+        # "7269",  # Suzuki Motor Corporation
+        # "7270",  # Subaru Corporation
+        # "7202",  # Isuzu Motors Limited
+        # "7205",  # Hino Motors, Ltd.
+        # "7224",  # Shizuoka Daihatsu Motor Co., Ltd.
         "7201",  # Honda Motor Co., Ltd.
         "7203",  # Toyota Motor Corporation
     ]
@@ -67,7 +78,7 @@ def main():
     selectors = [
         # "Tree",
         # "Lasso",
-        # "Correlation"
+        # "Correlation",
         "PCA",
         "SelectAll",
     ]
@@ -78,7 +89,7 @@ def main():
         feature_list_str,
         model_saver_loader,
         data_managers,
-        selectors
+        selectors,
     )
 
     while symbols:

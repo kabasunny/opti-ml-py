@@ -85,11 +85,16 @@ class FeaturePipeline:
             "macd",
             "macd_signal",
             "macd_hist",
+            "vwap",
+            "roc",
+            "cci",
+            "atr",
+            "wr",
         ]
 
         # 1個前から10個前の特徴量を正規化する列に追加
         for i in range(1, 6):
-            columns_to_normalize.append(f"lag_{i}")
+            # columns_to_normalize.append(f"lag_{i}") # セレクターによる除外率が高い
             columns_to_normalize.append(f"lag_{i}_indicator")
 
         # 特徴量を正規化
