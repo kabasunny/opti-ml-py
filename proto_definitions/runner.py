@@ -16,9 +16,9 @@ from proto_definitions.print_ml_stock_response import print_ml_stock_response_su
 
 if __name__ == "__main__":
     # 使用例
-    signals_csv_path = "data/stock_data/predictions/7224_2025-01-13.csv"
-    daily_data_csv_path = "data/stock_data/formated_raw/7224_2025-01-13.csv"
-    save_directory = "proto_definitions/ml_stock_response"
+    signals_csv_path = "data/stock_data/predictions/7203_2025-01-15.csv"
+    daily_data_csv_path = "data/stock_data/formated_raw/7203_2025-01-15.csv"
+    save_directory = "../go-optimal-stop/data/ml_stock_response"
 
     # Convert and save proto response
     ml_stock_response = convert_to_proto_response(signals_csv_path, daily_data_csv_path)
