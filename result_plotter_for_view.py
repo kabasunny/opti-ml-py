@@ -4,9 +4,9 @@ import seaborn as sns
 import os
 
 # データの読み込み
-stock_data_path = "data/stock_data/formated_raw/7203_2025-01-15.csv"
-predictions_data_path = "data/stock_data/predictions/7203_2025-01-15.csv"
-labels_data_path = "data/stock_data/labeled/7203_2025-01-15.csv"
+stock_data_path = "data/stock_data/formated_raw/2025-01-16/7203.csv"
+predictions_data_path = "data/stock_data/predictions/2025-01-16/7203.csv"
+labels_data_path = "data/stock_data/labeled/2025-01-16/7203.csv"
 
 stock_data = pd.read_csv(stock_data_path)
 predictions_data = pd.read_csv(predictions_data_path)

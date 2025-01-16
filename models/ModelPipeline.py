@@ -37,6 +37,7 @@ class ModelPipeline:
                 )
                 if confirm != "Y":
                     print("モデルの上書きをパスしました")
+                    self.model_created = True # ループで処理する際、確認は一度だけの確認とする
                     return
             self.models = ModelFactory.create_models(self.model_types)
             print("Created new models for training")

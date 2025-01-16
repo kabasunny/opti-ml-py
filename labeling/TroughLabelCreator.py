@@ -6,7 +6,6 @@ from labeling.utils.PeakBasedTroughSelector import PeakBasedTroughSelector
 from labeling.LabelCreatorABC import LabelCreatorABC
 from decorators.ArgsChecker import ArgsChecker  # デコレータクラスをインポート
 
-
 class TroughLabelCreator(LabelCreatorABC):
     def __init__(
         self,
@@ -65,6 +64,10 @@ class TroughLabelCreator(LabelCreatorABC):
                 if offset != 0:
                     adjusted_date = trough_date + pd.Timedelta(days=offset)
                     df.loc[df["date"] == adjusted_date, "label"] = 1
+
+        # データの最後の post_x 日分を不正解ラベルとする
+        invalid_label_start_date = df["date"].iloc[-post_x]
+        df.loc[df["date"] >= invalid_label_start_date, "label"] = 0
 
         # 指定された列を削除
         columns_to_drop = [

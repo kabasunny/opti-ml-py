@@ -2,10 +2,13 @@ import pandas as pd
 from models.ModelSaverLoader import ModelSaverLoader
 from AutomatedPipeline import AutomatedPipeline
 from data.DataManager import DataManager
-from selectores.SelectorFactory import SelectorFactory
+from datetime import datetime
 
 
 def main():
+    
+    current_date_str = datetime.now().strftime("%Y-%m-%d")
+
     symbols = [
         # "6146",
         # "6857",
@@ -62,7 +65,7 @@ def main():
     ]
 
     model_saver_loader = ModelSaverLoader(
-        model_save_path="models/trained_models", model_file_ext="pkl"
+        current_date_str, model_save_path="models/trained_models", model_file_ext="pkl"
     )
 
     feature_list_str = ["peak_trough", "fourier", "volume", "price", "past"]
@@ -83,7 +86,7 @@ def main():
 
     data_managers = {}
     for d_m_name in data_manager_names:
-        data_managers[d_m_name] = DataManager(base_data_path, d_m_name, file_ext)
+        data_managers[d_m_name] = DataManager(current_date_str, base_data_path, d_m_name, file_ext)
 
     selectors = [
         # "Tree",
