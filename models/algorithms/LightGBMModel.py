@@ -22,6 +22,7 @@ class LightGBMModel(BaseModelABC):
             "verbose": -1,
         }
         self.model = None
+        self.train_count = 0  # カウンタ変数を追加
 
     def train(
         self,
@@ -30,6 +31,9 @@ class LightGBMModel(BaseModelABC):
         X_test: pd.DataFrame,
         y_test: pd.Series,
     ) -> Tuple["BaseModelABC", Tuple[float, float, float, float]]:
+        # print(
+        #     f"開始前トレーニング済み回数{self.train_count} : カウンターLightGBM君(代表)"
+        # )
         lgb_train = lgb.Dataset(X_train, y_train)
         lgb_eval = lgb.Dataset(X_test, y_test, reference=lgb_train)
         self.model = lgb.train(
@@ -43,6 +47,10 @@ class LightGBMModel(BaseModelABC):
             ],
         )
         result = self.evaluate(X_test, y_test)
+        self.train_count += 1  # trainメソッドが呼ばれるたびにインクリメント
+        print(
+            f"終了時トレーニング回数{self.train_count} : カウンターはLightGBM君(代表)"
+        )
         return self, result
 
     @ArgsChecker((None, pd.DataFrame), pd.Series)
