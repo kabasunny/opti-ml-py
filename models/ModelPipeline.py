@@ -31,17 +31,21 @@ class ModelPipeline:
             print("Loaded existing models for retraining")
         else:
             # モデルが存在する場合、事前に確認
-            if self.saver_loader.check_existing_models(self.model_types):
+            d = self.saver_loader.check_existing_models(self.model_types)
+            if d and not self.model_created:
                 confirm = (
-                    input("現在のモデルを上書きしてよいですか? (Y/N): ").strip().upper()
+                    input(f"{d} 保存済みモデルを引き継ぎ、実行しますか? (Y/N): ")
+                    .strip()
+                    .upper()
                 )
-                if confirm != "Y":
-                    print("モデルの上書きをパスしました")
-                    self.model_created = True # ループで処理する際、確認は一度だけの確認とする
-                    return
-            self.models = ModelFactory.create_models(self.model_types)
-            print("Created new models for training")
-            self.model_created = True
+                if confirm == "Y":
+                    self.models = self.saver_loader.load_models(self.model_types)
+                    print("Loaded existing models for retraining")
+                else:
+                    print("新規でモデルを作成します")
+                    self.models = ModelFactory.create_models(self.model_types)
+                    print("Created new models for training")
+                    self.model_created = True
 
         full_data = self.t_a_t_m.load_data(symbol)
         # print(f"full_data{len(full_data)}")
@@ -67,4 +71,4 @@ class ModelPipeline:
         else:
             print("Model Train Pipeline completed successfully")
 
-        self.model_created = True  # モデルが作成されたことを設定
+        self.model_created = True

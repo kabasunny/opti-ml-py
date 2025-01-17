@@ -2,6 +2,7 @@ import os
 import pickle
 from typing import List
 
+
 class ModelSaverLoader:
     def __init__(self, date_str: str, model_save_path: str, model_file_ext: str):
         self.model_base_path = model_save_path
@@ -9,7 +10,9 @@ class ModelSaverLoader:
         self.date_str = date_str
 
     def generate_path(self, model_name: str) -> str:
-        return f"{self.model_base_path}/{self.date_str}/{model_name}.{self.model_file_ext}"
+        return (
+            f"{self.model_base_path}/{self.date_str}/{model_name}.{self.model_file_ext}"
+        )
 
     def save_models(self, models: List[object]):
         for model in models:
@@ -45,7 +48,7 @@ class ModelSaverLoader:
                 print(f"{model_type}のモデルファイルが存在しません。")
         return models
 
-    def check_existing_models(self, model_names: List[str]) -> bool:
+    def check_existing_models(self, model_names: List[str]) -> str:
         """保存済みモデルが存在するかチェック"""
         parent_dir = f"{self.model_base_path}/"
         dir_list = sorted(os.listdir(parent_dir), reverse=True)
@@ -55,5 +58,5 @@ class ModelSaverLoader:
                 for model_name in model_names:
                     filepath = f"{potential_path}/{model_name}.{self.model_file_ext}"
                     if os.path.exists(filepath):
-                        return True
-        return False
+                        return d
+        return None
