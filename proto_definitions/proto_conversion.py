@@ -6,75 +6,69 @@ from proto_definitions.ml_stock_service_pb2 import (
     MLDailyData,
     ModelPredictions,
 )
+from datetime import datetime
 
 
-def load_signals_csv(file_path):
-    df = pd.read_csv(file_path)
-    signal_dates = df[df["label"] == 1]["date"].tolist()
-    return signal_dates
+def convert_to_proto_response(raw_data_manager, predictions_data_manager, symbols):
+    responses = []
+    for symbol in symbols:
+        # raw_data_manager からデータを読み込む
+        raw_data_df = raw_data_manager.load_data(symbol)
+        daily_data_list = [
+            MLDailyData(
+                date=str(row["date"]),
+                open=float(row["open"]),
+                high=float(row["high"]),
+                low=float(row["low"]),
+                close=float(row["close"]),
+                volume=int(row["volume"]),
+            )
+            for index, row in raw_data_df.iterrows()
+        ]
 
+        # predictions_data_manager からデータを読み込む
+        predictions_df = predictions_data_manager.load_data(symbol)
+        signal_dates = predictions_df[predictions_df["label"] == 1]["date"].tolist()
 
-def load_daily_data_csv(file_path):
-    df = pd.read_csv(file_path)
-    return df
+        model_predictions = {}
+        for model in [
+            "LightGBM",
+            "RandomForest",
+            "XGBoost",
+            "CatBoost",
+            "AdaBoost",
+            "DecisionTree",
+            "GradientBoosting",
+            "ExtraTrees",
+            "Bagging",
+            "Voting",
+            "Stacking",
+        ]:
+            prediction_dates = predictions_df[predictions_df[model] == 1][
+                "date"
+            ].tolist()
+            model_predictions[model] = ModelPredictions(
+                prediction_dates=[str(date) for date in prediction_dates]
+            )
 
-
-def convert_to_proto_response(signals_csv_path, daily_data_csv_path):
-    signal_dates = load_signals_csv(signals_csv_path)
-    daily_data_df = load_daily_data_csv(daily_data_csv_path)
-
-    symbol = str(daily_data_df["symbol"].iloc[0])  # Symbol should be a string
-
-    daily_data_list = [
-        MLDailyData(
-            date=str(row["date"]),  # Ensure date is a string
-            open=float(row["open"]),  # Ensure open is a float
-            high=float(row["high"]),  # Ensure high is a float
-            low=float(row["low"]),  # Ensure low is a float
-            close=float(row["close"]),  # Ensure close is a float
-            volume=int(row["volume"]),  # Ensure volume is an integer
+        symbol_data = MLSymbolData(
+            symbol=symbol,
+            daily_data=daily_data_list,
+            signals=[str(signal) for signal in signal_dates],
+            model_predictions=model_predictions,
         )
-        for index, row in daily_data_df.iterrows()
-    ]
 
-    model_predictions = {}
-    signals_df = pd.read_csv(
-        signals_csv_path
-    )  # 追加: シグナルCSVファイルを再度読み込み
-    for model in [
-        "LightGBM",
-        "RandomForest",
-        "XGBoost",
-        "CatBoost",
-        "AdaBoost",
-        "SVM",
-        "KNeighbors",
-        "LogisticRegression",
-    ]:
-        prediction_dates = signals_df[signals_df[model] == 1]["date"].tolist()
-        model_predictions[model] = ModelPredictions(
-            prediction_dates=[str(date) for date in prediction_dates]
-        )  # Ensure dates are strings
+        responses.append(symbol_data)  # MLSymbolData を直接追加
 
-    symbol_data = MLSymbolData(
-        symbol=symbol,
-        daily_data=daily_data_list,
-        signals=[str(signal) for signal in signal_dates],  # Ensure signals are strings
-        model_predictions=model_predictions,  # Add model predictions
-    )
-
-    ml_stock_response = MLStockResponse(symbol_data=[symbol_data])
-
-    return ml_stock_response
+    # MLSymbolData のリストを含む結合レスポンスを作成
+    combined_response = MLStockResponse(symbol_data=responses)
+    return combined_response
 
 
-def save_proto_response_to_file(proto_response, save_directory, csv_file_path):
-    # Extract the file name without extension from the CSV file path
-    base_filename = os.path.basename(csv_file_path)
-    filename_without_extension = os.path.splitext(base_filename)[0]
-
-    # Create the save file path
-    save_file_path = os.path.join(save_directory, f"{filename_without_extension}.bin")
+def save_proto_response_to_file(proto_response, save_directory):
+    # Get the current date and time to use as the file name
+    current_date = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    save_file_path = os.path.join(save_directory, f"{current_date}.bin")
 
     # Save the proto response to a binary file
     with open(save_file_path, "wb") as f:

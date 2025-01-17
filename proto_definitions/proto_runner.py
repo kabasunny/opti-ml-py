@@ -13,18 +13,32 @@ from proto_conversion import (
     load_proto_response_from_file,
 )
 from proto_definitions.print_ml_stock_response import print_ml_stock_response_summary
+from data.DataManager import DataManager
+from datetime import datetime
 
 if __name__ == "__main__":
-    # 使用例
-    signals_csv_path = "data/stock_data/predictions/7203_2025-01-15.csv"
-    daily_data_csv_path = "data/stock_data/formated_raw/7203_2025-01-15.csv"
+    current_date_str = datetime.now().strftime("%Y-%m-%d")
+    base_data_path = "data/stock_data"
+    file_ext = "csv"  # "parquet"
+
+    raw_data_manager = DataManager(
+        current_date_str, base_data_path, "formated_raw", file_ext
+    )
+    predictions_data_manager = DataManager(
+        current_date_str, base_data_path, "predictions", file_ext
+    )
     save_directory = "../go-optimal-stop/data/ml_stock_response"
 
+    symbols = [
+        "7203",
+        "7267",
+    ]
+
     # Convert and save proto response
-    ml_stock_response = convert_to_proto_response(signals_csv_path, daily_data_csv_path)
-    save_file_path = save_proto_response_to_file(
-        ml_stock_response, save_directory, signals_csv_path
+    ml_stock_response = convert_to_proto_response(
+        raw_data_manager, predictions_data_manager, symbols
     )
+    save_file_path = save_proto_response_to_file(ml_stock_response, save_directory)
 
     # Load and print proto response
     loaded_proto_response = load_proto_response_from_file(save_file_path)
