@@ -6,7 +6,6 @@ from typing import List
 from models.ModelFactory import ModelFactory
 from decorators.ArgsChecker import ArgsChecker
 
-
 class ModelPipeline:
     @ArgsChecker((None, DataManager, ModelSaverLoader, List[str]), None)
     def __init__(
@@ -26,26 +25,26 @@ class ModelPipeline:
         self.y_test = None
 
     def run(self, symbol):
-        if self.model_created:
-            self.models = self.saver_loader.load_models(self.model_types)
-            print("Loaded existing models for retraining")
+        d = self.saver_loader.check_existing_models(self.model_types)
+        if d:
+            confirm = (
+                input(f"{d} 保存済みモデルを引き継ぎ、実行しますか? (Y/N): ")
+                .strip()
+                .upper()
+            )
+            if confirm == "Y":
+                self.models = self.saver_loader.load_models(self.model_types)
+                print("Loaded existing models for retraining")
+            else:
+                print("新規でモデルを作成します")
+                self.models = ModelFactory.create_models(self.model_types)
+                print("Created new models for training")
+                self.model_created = True
         else:
-            # モデルが存在する場合、事前に確認
-            d = self.saver_loader.check_existing_models(self.model_types)
-            if d and not self.model_created:
-                confirm = (
-                    input(f"{d} 保存済みモデルを引き継ぎ、実行しますか? (Y/N): ")
-                    .strip()
-                    .upper()
-                )
-                if confirm == "Y":
-                    self.models = self.saver_loader.load_models(self.model_types)
-                    print("Loaded existing models for retraining")
-                else:
-                    print("新規でモデルを作成します")
-                    self.models = ModelFactory.create_models(self.model_types)
-                    print("Created new models for training")
-                    self.model_created = True
+            print("新規でモデルを作成します")
+            self.models = ModelFactory.create_models(self.model_types)
+            print("Created new models for training")
+            self.model_created = True
 
         full_data = self.t_a_t_m.load_data(symbol)
         # print(f"full_data{len(full_data)}")

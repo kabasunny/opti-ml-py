@@ -82,13 +82,11 @@ class AutomatedPipeline:
 
         try:
             self.raw_data_pipeline.run(symbol)
-
             self.preprocess_pipeline.run(symbol)
             self.label_create_pipeline.run(symbol)
             self.feature_pipeline.run(symbol)
             self.selector_pipeline.run(symbol)
             self.data_for_model_pipeline.run(symbol)
-
             self.model_pipeline.run(symbol)
             self.model_predict_pipeline.run(symbol)
 
