@@ -38,7 +38,7 @@ class DataManager:
     def load_data(self, symbol: str) -> pd.DataFrame:
         """ラベルデータをロードするメソッド"""
         dir_path = f"{self.base_path}/{self.d_m_name}/{self.date_str}/"
-        print(dir_path)
+        # print(dir_path)
         if not os.path.exists(dir_path):
             # 日付のインスタンス変数に合致するディレクトリがない場合、過去の日付を探索
             parent_dir = f"{self.base_path}/{self.d_m_name}/"

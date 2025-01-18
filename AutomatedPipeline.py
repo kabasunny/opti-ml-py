@@ -1,5 +1,4 @@
 from data.YahooFinanceStockDataFetcher import YahooFinanceStockDataFetcher
-from data.DataManager import DataManager
 from data.RawDataPipeline import RawDataPipeline
 from preprocessing.PreprocessPipeline import PreprocessPipeline
 from labeling.LabelCreatePipeline import LabelCreatePipeline
@@ -11,6 +10,8 @@ from features.AnalyzerFactory import AnalyzerFactory
 from selectores.SelectorFactory import SelectorFactory
 from models.ModelPipeline import ModelPipeline
 from models.ModelPredictPipeline import ModelPredictPipeline
+import time
+
 
 
 class AutomatedPipeline:
@@ -81,16 +82,22 @@ class AutomatedPipeline:
         print(f"Symbol of current data: {symbol}")
 
         try:
-            self.raw_data_pipeline.run(symbol)
+            pipelines = [
+                ("RawDataPipeline", self.raw_data_pipeline),
+                ("PreprocessPipeline", self.preprocess_pipeline),
+                ("LabelCreatePipeline", self.label_create_pipeline),
+                ("FeaturePipeline", self.feature_pipeline),
+                ("SelectorPipeline", self.selector_pipeline),
+                ("DataForModelPipeline", self.data_for_model_pipeline),
+                ("ModelPipeline", self.model_pipeline),
+                ("ModelPredictPipeline", self.model_predict_pipeline),
+            ]
 
-            self.preprocess_pipeline.run(symbol)
-            self.label_create_pipeline.run(symbol)
-            self.feature_pipeline.run(symbol)
-            self.selector_pipeline.run(symbol)
-            self.data_for_model_pipeline.run(symbol)
-
-            self.model_pipeline.run(symbol)
-            self.model_predict_pipeline.run(symbol)
+            for pipeline_name, pipeline in pipelines:
+                start_time = time.time()
+                pipeline.run(symbol)
+                elapsed_time = time.time() - start_time
+                print(f"{pipeline_name} processing time: {elapsed_time:.4f} 秒")
 
         except Exception as e:
             print(f"{symbol} の処理中にエラーが発生しました: {e}")
