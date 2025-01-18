@@ -6,12 +6,13 @@ from proto_conversion.ml_stock_service_pb2 import (
 )
 
 class ProtoConvertPipeline:
-    def __init__(self, raw_data_manager, predictions_data_manager, proto_saver_loader):
+    def __init__(self, raw_data_manager, real_pred_data_manager, proto_saver_loader, model_types):
         self.raw_data_manager = raw_data_manager
-        self.predictions_data_manager = predictions_data_manager
+        self.real_pred_data_manager = real_pred_data_manager
         self.proto_saver_loader = proto_saver_loader
+        self.model_types = model_types
 
-    def run(self, symbols):
+    def run(self, symbols): # リストを受けるため他のパイプラインと異なる
         responses = []
         for symbol in symbols:
             # raw_data_manager からデータを読み込む
@@ -25,27 +26,15 @@ class ProtoConvertPipeline:
                     close=float(row["close"]),
                     volume=int(row["volume"]),
                 )
-                for index, row in raw_data_df.iterrows()
+                for _, row in raw_data_df.iterrows()
             ]
 
             # predictions_data_manager からデータを読み込む
-            predictions_df = self.predictions_data_manager.load_data(symbol)
+            predictions_df = self.real_pred_data_manager.load_data(symbol)
             signal_dates = predictions_df[predictions_df["label"] == 1]["date"].tolist()
 
             model_predictions = {}
-            for model in [
-                "LightGBM",
-                "RandomForest",
-                "XGBoost",
-                "CatBoost",
-                "AdaBoost",
-                "DecisionTree",
-                "GradientBoosting",
-                "ExtraTrees",
-                "Bagging",
-                "Voting",
-                "Stacking",
-            ]:
+            for model in self.model_types:
                 prediction_dates = predictions_df[predictions_df[model] == 1][
                     "date"
                 ].tolist()

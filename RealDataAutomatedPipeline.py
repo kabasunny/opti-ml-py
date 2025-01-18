@@ -5,16 +5,15 @@ from labeling.LabelCreatePipeline import LabelCreatePipeline
 from labeling.TroughLabelCreator import TroughLabelCreator
 from features.FeaturePipeline import FeaturePipeline
 from selectores.SelectorPipeline import SelectorPipeline
-from data.DataForModelPipeline import DataForModelPipeline
+from proto_conversion.ProtoConvertPipeline import ProtoConvertPipeline
 from features.AnalyzerFactory import AnalyzerFactory
 from selectores.SelectorFactory import SelectorFactory
-from models.ModelPipeline import ModelPipeline
-from models.ModelPredictPipeline import ModelPredictPipeline
+from for_real.ForRealPredictPipeline import ForRealPredictPipeline
 import time
 
 
 
-class DataAutomatedPipeline:
+class RealDataAutomatedPipeline:
     def __init__(
         self,
         before_period_days,  # 特徴量生成に必要な日数
@@ -22,16 +21,17 @@ class DataAutomatedPipeline:
         feature_list_str,
         model_saver_loader,
         data_managers,
-        selectors  # 新しい引数を追加
+        selectors,
+        proto_saver_loader
     ):
         self.before_period_days = before_period_days
         self.model_types = model_types
         self.feature_list_str = feature_list_str
         self.model_saver_loader = model_saver_loader
-        self.model_created = False  # モデルが作成済みかどうかのフラグ
-
+        self.model_created = False 
         self.data_managers = data_managers
         self.selectors = selectors
+        self.proto_saver_loader = proto_saver_loader
 
         # 各パイプラインをインスタンス変数として保持
         self.raw_data_pipeline = RawDataPipeline(
@@ -39,7 +39,8 @@ class DataAutomatedPipeline:
             fetcher=YahooFinanceStockDataFetcher(),
         )
         self.preprocess_pipeline = PreprocessPipeline(
-            self.data_managers["formated_raw"], self.data_managers["processed_raw"]
+            self.data_managers["formated_raw"], 
+            self.data_managers["processed_raw"]
         )
         self.label_create_pipeline = LabelCreatePipeline(
             self.data_managers["formated_raw"],
@@ -57,26 +58,23 @@ class DataAutomatedPipeline:
             self.data_managers["labeled"],
             self.data_managers["normalized_feature"],
             self.data_managers["selected_feature"],
-            SelectorFactory.create_selectors(self.selectors),  # 新しい引数をここで使用
+            self.data_managers["selected_ft_with_label"],
+            SelectorFactory.create_selectors(self.selectors),
         )
-        self.data_for_model_pipeline = DataForModelPipeline(
-            self.data_managers["labeled"],
-            self.data_managers["selected_feature"],
-            self.data_managers["training_and_test"],
-            self.data_managers["practical"],
-        )
-        self.model_pipeline = ModelPipeline(
-            self.data_managers["training_and_test"],
+        self.real_predict_pipeline = ForRealPredictPipeline(
             self.model_saver_loader,
+            data_managers["selected_ft_with_label"],
+            data_managers["real_predictions"],
             self.model_types,
         )
-        self.model_predict_pipeline = ModelPredictPipeline(
-            self.model_saver_loader,
-            self.data_managers["training_and_test"],
-            self.data_managers["practical"],
-            self.data_managers["predictions"],
+
+        # ProtoConvertPipelineの初期化と実行
+        self.proto_convert_pipeline = ProtoConvertPipeline(
+            self.data_managers["formated_raw"],
+            self.data_managers["real_predictions"],
+            self.proto_saver_loader, 
             self.model_types,
-        )
+            )
 
     def process_symbol(self, symbol):
         print(f"Symbol of current data: {symbol}")
@@ -88,9 +86,7 @@ class DataAutomatedPipeline:
                 ("LabelCreatePipeline", self.label_create_pipeline),
                 ("FeaturePipeline", self.feature_pipeline),
                 ("SelectorPipeline", self.selector_pipeline),
-                ("DataForModelPipeline", self.data_for_model_pipeline),
-                ("ModelPipeline", self.model_pipeline),
-                ("ModelPredictPipeline", self.model_predict_pipeline),
+                ("ForRealPredictPipeline", self.real_predict_pipeline),
             ]
 
             for pipeline_name, pipeline in pipelines:
@@ -101,3 +97,8 @@ class DataAutomatedPipeline:
 
         except Exception as e:
             print(f"{symbol} の処理中にエラーが発生しました: {e}")
+
+    def finish_prosess(self, symbols):
+        print(f"Proto file processing for all symbols")
+        self.proto_convert_pipeline.run(symbols) # リストを受けるため他のパイプラインと異なる
+

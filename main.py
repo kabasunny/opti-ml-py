@@ -1,13 +1,16 @@
-import pandas as pd
-from models.ModelSaverLoader import ModelSaverLoader
-from TrainAutomatedPipeline import TrainAutomatedPipeline
-from data.DataManager import DataManager
+import random
 from datetime import datetime
-from symbols import symbols  # 追加
-from model_types import model_types  # モデルタイプをインポート
+
+from models.ModelSaverLoader import ModelSaverLoader
+from data.DataManager import DataManager
+from proto_conversion.ProtoSaverLoader import ProtoSaverLoader
+from symbols import symbols  # 別ファイルで定義
+from model_types import model_types  # 別ファイルで定義
+
+from TrainAutomatedPipeline import TrainAutomatedPipeline  # 過酷なトレーニングを専門とする
+from RealDataAutomatedPipeline import RealDataAutomatedPipeline  # 実践シミュレーション用protofileを取り揃える
 
 def main():
-    
     current_date_str = datetime.now().strftime("%Y-%m-%d")
 
     before_period_days = 365 * 2  # 特徴量生成に必要なデータ期間
@@ -31,6 +34,7 @@ def main():
         "training_and_test",
         "practical",
         "predictions",
+        "real_predictions",
     ]
 
     data_managers = {}
@@ -45,7 +49,7 @@ def main():
         "SelectAll",
     ]
 
-    pipeline = TrainAutomatedPipeline(
+    train_pipeline = TrainAutomatedPipeline(
         before_period_days,
         model_types,
         feature_list_str,
@@ -54,9 +58,41 @@ def main():
         selectors,
     )
 
-    while symbols:
-        symbol = symbols.pop(0)
-        pipeline.process_symbol(symbol)
+    # ProtoSaverLoaderの初期化
+    file_path = "../go-optimal-stop/data/ml_stock_response/latest_response.bin"
+    proto_saver_loader = ProtoSaverLoader(file_path)
+
+    real_data_pipeline = RealDataAutomatedPipeline(
+        before_period_days,
+        model_types,
+        feature_list_str,
+        model_saver_loader,
+        data_managers,
+        selectors,
+        proto_saver_loader
+    )
+
+    # シンボルをランダムにシャッフル
+    random.shuffle(symbols)
+
+    # 振り分け比率を設定（例：70%をトレーニング、30%を実データ用）
+    train_ratio = 0.7
+    train_size = int(train_ratio * len(symbols))
+    train_symbols = symbols[:train_size]
+    real_data_symbols = symbols[train_size:]
+
+    # トレーニングを行う
+    while train_symbols:
+        train_symbol = train_symbols.pop(0)
+        train_pipeline.process_symbol(train_symbol)
+
+    # 予測結果を作成
+    while real_data_symbols:
+        real_data_symbol = real_data_symbols.pop(0)
+        real_data_pipeline.process_symbol(real_data_symbol)
+    
+    # シミュレーション用データ形式に変換
+    real_data_pipeline.finish_prosess(real_data_symbols)
 
 if __name__ == "__main__":
     main()

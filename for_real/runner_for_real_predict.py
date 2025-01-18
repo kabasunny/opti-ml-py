@@ -39,13 +39,13 @@ def runner():
 
 
     # 予測パイプラインの作成と実行
-    bach_predict_pipeline = ForRealPredictPipeline(
+    real_predict_pipeline = ForRealPredictPipeline(
         model_saver_loader,
         data_managers["selected_ft_with_label"],
         data_managers["real_predictions"],
         model_types,
     )
-    bach_predict_pipeline.run(symbol)
+    real_predict_pipeline.run(symbol)
 
 
 if __name__ == "__main__":

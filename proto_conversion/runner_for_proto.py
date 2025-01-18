@@ -12,6 +12,8 @@ from data.DataManager import DataManager
 from datetime import datetime
 from proto_conversion.ProtoConvertPipeline import ProtoConvertPipeline
 from proto_conversion.ProtoSaverLoader import ProtoSaverLoader
+from symbols import symbols  # 別ファイルで定義
+from model_types import model_types  # 別ファイルで定義
 
 if __name__ == "__main__":
     current_date_str = datetime.now().strftime("%Y-%m-%d")
@@ -21,22 +23,16 @@ if __name__ == "__main__":
     raw_data_manager = DataManager(
         current_date_str, base_data_path, "formated_raw", file_ext
     )
-    predictions_data_manager = DataManager(
-        current_date_str, base_data_path, "predictions", file_ext
+    real_pred_data_manager = DataManager(
+        current_date_str, base_data_path, "Real_predictions", file_ext
     )
     file_path = "../go-optimal-stop/data/ml_stock_response/latest_response.bin"
-
-    symbols = [
-        "7203",
-        "7267",
-    ]
 
     # ProtoSaverLoaderの初期化
     proto_saver_loader = ProtoSaverLoader(file_path)
 
     # ProtoConvertPipelineの初期化と実行
-    proto_convert_pipeline = ProtoConvertPipeline(raw_data_manager, predictions_data_manager, proto_saver_loader)
-    proto_response = proto_convert_pipeline.run(symbols)
+    ProtoConvertPipeline(raw_data_manager, real_pred_data_manager, proto_saver_loader, model_types).run(symbols) # リストを受けるため他のパイプラインと異なる
     print("Proto conversion and saving completed.")
 
 

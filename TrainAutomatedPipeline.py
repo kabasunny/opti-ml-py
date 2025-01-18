@@ -58,7 +58,7 @@ class TrainAutomatedPipeline:
             self.data_managers["normalized_feature"],
             self.data_managers["selected_feature"],
             self.data_managers["selected_ft_with_label"],
-            SelectorFactory.create_selectors(self.selectors),  # 新しい引数をここで使用
+            SelectorFactory.create_selectors(self.selectors), 
         )
         self.data_for_model_pipeline = DataForModelPipeline(
             self.data_managers["labeled"],
