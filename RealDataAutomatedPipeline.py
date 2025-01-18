@@ -14,7 +14,7 @@ import time
 
 
 
-class AutomatedPipeline:
+class DataAutomatedPipeline:
     def __init__(
         self,
         before_period_days,  # 特徴量生成に必要な日数

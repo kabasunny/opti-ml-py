@@ -1,36 +1,16 @@
 import pandas as pd
 from models.ModelSaverLoader import ModelSaverLoader
-from AutomatedPipeline import AutomatedPipeline
+from TrainAutomatedPipeline import TrainAutomatedPipeline
 from data.DataManager import DataManager
 from datetime import datetime
 from symbols import symbols  # 追加
+from model_types import model_types  # モデルタイプをインポート
 
 def main():
     
     current_date_str = datetime.now().strftime("%Y-%m-%d")
 
     before_period_days = 365 * 2  # 特徴量生成に必要なデータ期間
-    model_types = [
-        "LightGBM",
-        "RandomForest",
-        "XGBoost",
-        "CatBoost",
-        "AdaBoost",
-        # "SVM",
-        # "KNeighbors",
-        # "LogisticRegression",
-        "DecisionTree",
-        "GradientBoosting",
-        # "NaiveBayes",
-        # "RidgeRegression",
-        "ExtraTrees",
-        "Bagging",
-        "Voting",
-        "Stacking",
-        # "PassiveAggressive",
-        # "Perceptron",
-        # "SGD",
-    ]
 
     model_saver_loader = ModelSaverLoader(
         current_date_str, model_save_path="models/trained_models", model_file_ext="pkl"
@@ -47,6 +27,7 @@ def main():
         "labeled",
         "normalized_feature",
         "selected_feature",
+        "selected_ft_with_label",
         "training_and_test",
         "practical",
         "predictions",
@@ -64,7 +45,7 @@ def main():
         "SelectAll",
     ]
 
-    pipeline = AutomatedPipeline(
+    pipeline = TrainAutomatedPipeline(
         before_period_days,
         model_types,
         feature_list_str,
