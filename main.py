@@ -73,7 +73,7 @@ def main():
     )
 
     # トレーニングと実データ用シンボルを取得
-    train_symbols, real_data_symbols = get_train_and_real_data_symbols(train_ratio=0.7)
+    train_symbols, real_data_symbols = get_train_and_real_data_symbols(train_ratio=0.9)
     r_d_symbols_copy = real_data_symbols.copy()
     print(f"train_symbols : {train_symbols}")
     print(f"real_data_symbols : {real_data_symbols}")

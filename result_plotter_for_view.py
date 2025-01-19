@@ -1,12 +1,16 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from model_types import model_types  # 別ファイルで定義
 import os
 
+symbol = "2914"
+date = "2025-01-19"
+
 # データの読み込み
-stock_data_path = "data/stock_data/formated_raw/2025-01-16/7203.csv"
-predictions_data_path = "data/stock_data/predictions/2025-01-16/7203.csv"
-labels_data_path = "data/stock_data/labeled/2025-01-16/7203.csv"
+stock_data_path = f"data/stock_data/formated_raw/{date}/{symbol}.csv"
+predictions_data_path = f"data/stock_data/real_predictions/{date}/{symbol}.csv"
+labels_data_path = f"data/stock_data/labeled/{date}/{symbol}.csv"
 
 stock_data = pd.read_csv(stock_data_path)
 predictions_data = pd.read_csv(predictions_data_path)
@@ -24,29 +28,7 @@ plot_data = pd.merge(
 )
 
 # モデルごとにプロットを作成
-models = [
-    "LightGBM",
-    "RandomForest",
-    "XGBoost",
-    "CatBoost",
-    "AdaBoost",
-    "SVM",
-    "KNeighbors",
-    "LogisticRegression",
-    "DecisionTree",
-    "GradientBoosting",
-    "NaiveBayes",
-    "RidgeRegression",
-    "ExtraTrees",
-    "Bagging",
-    "Voting",
-    "Stacking",
-    "PassiveAggressive",
-    "Perceptron",
-    "SGD",
-]
-
-for model in models:
+for model in model_types:
     if model in plot_data.columns:
         plt.figure(figsize=(14, 7))
 
