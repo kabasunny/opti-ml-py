@@ -10,6 +10,7 @@ from features.AnalyzerFactory import AnalyzerFactory
 from selectores.SelectorFactory import SelectorFactory
 from for_real.ForRealPredictPipeline import ForRealPredictPipeline
 import time
+from proto_conversion.print_ml_stock_response import print_ml_stock_response_summary
 
 
 
@@ -100,5 +101,10 @@ class RealDataAutomatedPipeline:
 
     def finish_prosess(self, symbols):
         print(f"Proto file processing for all symbols")
+        print(symbols)
         self.proto_convert_pipeline.run(symbols) # リストを受けるため他のパイプラインと異なる
 
+        
+        # # 保存したプロトコルバッファーの読み込み
+        # loaded_proto_response = self.proto_saver_loader.load_proto_response_from_file()
+        # print_ml_stock_response_summary(loaded_proto_response)

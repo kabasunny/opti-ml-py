@@ -1,6 +1,7 @@
-import os
-from datetime import datetime
+
 from proto_conversion.ml_stock_service_pb2 import MLStockResponse
+
+from proto_conversion.print_ml_stock_response import print_ml_stock_response_summary
 
 class ProtoSaverLoader:
     def __init__(self, file_path):
@@ -10,6 +11,7 @@ class ProtoSaverLoader:
         # Save the proto response to a binary file
         with open(self.file_path, "wb") as f:
             f.write(proto_response.SerializeToString())
+        # print_ml_stock_response_summary(proto_response)
 
         return self.file_path
 

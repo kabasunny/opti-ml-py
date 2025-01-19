@@ -14,7 +14,7 @@ class ForRealPredictPipeline:
     ):
         self.model_saver_loader = model_saver_loader
         self.selected_feature_manager = selected_ft_w_l_manager
-        self.bach_predictions_data_manager = bach_predictions_data_manager
+        self.real_predictions_data_manager = bach_predictions_data_manager
         self.model_types = model_types
         self.models = None
 
@@ -32,7 +32,7 @@ class ForRealPredictPipeline:
         correct_count = practical_data[practical_data["label"] == 1].shape[0]
         incorrect_count = practical_data[practical_data["label"] == 0].shape[0]
         ratio_pr = round(incorrect_count / correct_count, 1)
-        print(f"bach_prediction by trained model... correct:incorrect = 1:{ratio_pr}")
+        print(f"real_prediction by trained model... correct:incorrect = 1:{ratio_pr}")
         print(f"correct:{correct_count}, incorrect:{incorrect_count}")
 
         # 特徴量を抽出
@@ -50,7 +50,8 @@ class ForRealPredictPipeline:
         predictions_df["date"] = practical_data["date"]
         predictions_df["symbol"] = practical_data["symbol"]
         predictions_df["label"] = practical_data["label"]
-        self.bach_predictions_data_manager.save_data(predictions_df, symbol)
+        self.real_predictions_data_manager.save_data(predictions_df, symbol)
+        
 
         # モデルの評価
         evaluations_df = ModelPredictor.evaluate(

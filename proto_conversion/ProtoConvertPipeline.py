@@ -56,5 +56,3 @@ class ProtoConvertPipeline:
 
         # 保存処理を実行
         self.proto_saver_loader.save_proto_response_to_file(combined_response)
-
-        return combined_response

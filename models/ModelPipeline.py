@@ -17,7 +17,7 @@ class ModelPipeline:
         self.t_a_t_m = training_and_test_data_manager
         self.saver_loader = saver_loader
         self.model_types = model_types
-        self.model_created = False
+        self.models_initialized = False
         self.models = None
         self.X_train = None
         self.X_test = None
@@ -25,26 +25,27 @@ class ModelPipeline:
         self.y_test = None
 
     def run(self, symbol):
-        d = self.saver_loader.check_existing_models(self.model_types)
-        if d:
-            confirm = (
-                input(f"{d} 保存済みモデルを引き継ぎ、実行しますか? (Y/N): ")
-                .strip()
-                .upper()
-            )
-            if confirm == "Y":
-                self.models = self.saver_loader.load_models(self.model_types)
-                print("Loaded existing models for retraining")
+        if not self.models_initialized:
+            d = self.saver_loader.check_existing_models(self.model_types)
+            if d:
+                confirm = (
+                    input(f"{d} 保存済みモデルを引き継ぎ、実行しますか? (Y/N): ")
+                    .strip()
+                    .upper()
+                )
+                if confirm == "Y":
+                    self.models = self.saver_loader.load_models(self.model_types)
+                    print("Loaded existing models for retraining")
+                else:
+                    print("新規でモデルを作成します")
+                    self.models = ModelFactory.create_models(self.model_types)
+                    print("Created new models for training")
             else:
                 print("新規でモデルを作成します")
                 self.models = ModelFactory.create_models(self.model_types)
                 print("Created new models for training")
-                self.model_created = True
-        else:
-            print("新規でモデルを作成します")
-            self.models = ModelFactory.create_models(self.model_types)
-            print("Created new models for training")
-            self.model_created = True
+
+            self.models_initialized = True  # 初期化済みフラグを設定
 
         full_data = self.t_a_t_m.load_data(symbol)
         # print(f"full_data{len(full_data)}")
@@ -65,9 +66,5 @@ class ModelPipeline:
         print(results_df)
         self.saver_loader.save_models(self.models)
 
-        if self.model_created:
-            print("Model Re Train Pipeline completed successfully")
-        else:
-            print("Model Train Pipeline completed successfully")
+        print("Model Pipeline completed successfully")
 
-        self.model_created = True

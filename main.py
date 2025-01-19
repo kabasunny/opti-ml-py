@@ -4,7 +4,7 @@ from datetime import datetime
 from models.ModelSaverLoader import ModelSaverLoader
 from data.DataManager import DataManager
 from proto_conversion.ProtoSaverLoader import ProtoSaverLoader
-from symbols import symbols  # 別ファイルで定義
+from symbols import get_train_and_real_data_symbols  # 別ファイルで定義
 from model_types import model_types  # 別ファイルで定義
 
 from TrainAutomatedPipeline import TrainAutomatedPipeline  # 過酷なトレーニングを専門とする
@@ -59,8 +59,8 @@ def main():
     )
 
     # ProtoSaverLoaderの初期化
-    file_path = "../go-optimal-stop/data/ml_stock_response/latest_response.bin"
-    proto_saver_loader = ProtoSaverLoader(file_path)
+    proto_file_path = "../go-optimal-stop/data/ml_stock_response/latest_response.bin"
+    proto_saver_loader = ProtoSaverLoader(proto_file_path)
 
     real_data_pipeline = RealDataAutomatedPipeline(
         before_period_days,
@@ -72,14 +72,11 @@ def main():
         proto_saver_loader
     )
 
-    # シンボルをランダムにシャッフル
-    random.shuffle(symbols)
-
-    # 振り分け比率を設定（例：70%をトレーニング、30%を実データ用）
-    train_ratio = 0.7
-    train_size = int(train_ratio * len(symbols))
-    train_symbols = symbols[:train_size]
-    real_data_symbols = symbols[train_size:]
+    # トレーニングと実データ用シンボルを取得
+    train_symbols, real_data_symbols = get_train_and_real_data_symbols(train_ratio=0.7)
+    r_d_symbols_copy = real_data_symbols.copy()
+    print(f"train_symbols : {train_symbols}")
+    print(f"real_data_symbols : {real_data_symbols}")
 
     # トレーニングを行う
     while train_symbols:
@@ -92,7 +89,7 @@ def main():
         real_data_pipeline.process_symbol(real_data_symbol)
     
     # シミュレーション用データ形式に変換
-    real_data_pipeline.finish_prosess(real_data_symbols)
+    real_data_pipeline.finish_prosess(r_d_symbols_copy)
 
 if __name__ == "__main__":
     main()
